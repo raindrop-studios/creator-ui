@@ -24,6 +24,7 @@ function Wizard<ComponentProps = {}>({
     goToNext,
     goToPrevious,
     isFirst,
+    goToStep,
   } = useFormWizard({
     steps: steps.map(({ hash }) => hash),
     complete: onComplete,
@@ -92,6 +93,7 @@ function Wizard<ComponentProps = {}>({
                   isMobile ? null : stepIndex < currentStepIndex ? Check : null
                 }
                 disabled={stepIndex > currentStepIndex}
+                onClick={stepIndex < currentStepIndex ? () => {goToStep(stepIndex)} : null}
               >
                 <StepLayout
                   {...step}

@@ -7,6 +7,7 @@ import { Wizard } from ".";
 import { RadioInput, IntegerInput, PublicKeyInput } from "./Inputs";
 import { SubStepProps } from "./FormStep";
 import { Form, FormikSubmitButton } from "./Form";
+import { Button } from "baseui/button";
 
 export default {
   title: "Wizard",
@@ -62,9 +63,18 @@ const NumberOfCups = ({ handleSubmit, data }: SubStepProps) => {
   });
   type TValues = yup.InferType<typeof schema>;
   const submit = (values: TValues) => {
+    let cupsData = data?.cups || [];
+    if (cupsData.length < values.numCups) {
+      cupsData = [
+        ...cupsData,
+        ...Array(values.numCups - cupsData.length).fill({}),
+      ];
+    } else if (cupsData.length > values.numCups) {
+      cupsData = cupsData.slice(0, values.numCups);
+    }
     handleSubmit({
       numCups: values.numCups,
-      cups: Array(values.numCups).fill({}),
+      cups: cupsData,
     });
   };
   return (
@@ -110,15 +120,26 @@ const CupDetails = ({
   };
 
   return (
-    <RadioInput.Standalone
-      title={`How do you take cup of tea no. ${cupNum + 1}?`}
-      options={[
-        { title: "Normal", value: "hot" },
-        { title: "Iced", value: "cold" },
-      ]}
-      onSelect={handleSubmit}
-      value={data?.cups[cupNum]?.temperature}
-    />
+    <>
+      <RadioInput.Standalone
+        title={`How do you take cup of tea no. ${cupNum + 1}?`}
+        options={[
+          { title: "Normal", value: "hot" },
+          { title: "Iced", value: "cold" },
+        ]}
+        onSelect={handleSubmit}
+        value={data?.cups[cupNum]?.temperature}
+      />
+      {data?.cups[cupNum]?.temperature && (
+        <Button
+          type="button"
+          onClick={() => handleSubmit(data?.cups[cupNum]?.temperature)}
+          style={{ alignSelf: "flex-end" }}
+        >
+          Next
+        </Button>
+      )}
+    </>
   );
 };
 
