@@ -1,12 +1,12 @@
 import React from "react";
 
-import { Button } from "baseui/button";
 import { Formik, FormikHelpers } from "formik";
 import * as yup from "yup";
 
 import { Wizard } from ".";
 import { RadioInput, IntegerInput, PublicKeyInput } from "./Inputs";
 import { SubStepProps } from "./FormStep";
+import { Form, FormikSubmitButton } from "./Form";
 
 export default {
   title: "Wizard",
@@ -34,7 +34,7 @@ const TeaPreference = ({ data, handleSubmit }: SubStepProps) => {
       validationSchema={schema}
     >
       {(props) => (
-        <form onSubmit={props.handleSubmit}>
+        <Form onSubmit={props.handleSubmit}>
           <RadioInput.Inline
             name="likesTea"
             title="Do you drink tea?"
@@ -49,14 +49,8 @@ const TeaPreference = ({ data, handleSubmit }: SubStepProps) => {
             value={props.values.likesTea}
             error={props.errors.likesTea}
           />
-          <Button
-            type="submit"
-            disabled={!props.isValid}
-            isLoading={props.isSubmitting || props.isValidating}
-          >
-            Next
-          </Button>
-        </form>
+          <FormikSubmitButton>Next</FormikSubmitButton>
+        </Form>
       )}
     </Formik>
   );
@@ -84,7 +78,7 @@ const NumberOfCups = ({ handleSubmit, data }: SubStepProps) => {
       validationSchema={schema}
     >
       {(props) => (
-        <form onSubmit={props.handleSubmit}>
+        <Form onSubmit={props.handleSubmit}>
           <IntegerInput.Inline
             name="numCups"
             title="How many cups do you drink a day?"
@@ -95,14 +89,8 @@ const NumberOfCups = ({ handleSubmit, data }: SubStepProps) => {
             value={props.values.numCups}
             error={props.errors.numCups}
           />
-          <Button
-            type="submit"
-            disabled={!props.isValid}
-            isLoading={props.isSubmitting || props.isValidating}
-          >
-            Next
-          </Button>
-        </form>
+          <FormikSubmitButton>Next</FormikSubmitButton>
+        </Form>
       )}
     </Formik>
   );
@@ -152,7 +140,7 @@ const SendReward = ({ handleSubmit, data }: SubStepProps) => {
       }}
     >
       {(props) => (
-        <form onSubmit={props.handleSubmit}>
+        <Form onSubmit={props.handleSubmit}>
           <PublicKeyInput.Formik
             name="wallet"
             title="What's your wallet address?"
@@ -162,14 +150,8 @@ const SendReward = ({ handleSubmit, data }: SubStepProps) => {
             value={props.values.wallet}
             error={props.errors.wallet}
           />
-          <Button
-            type="submit"
-            disabled={!props.isValid}
-            isLoading={props.isSubmitting || props.isValidating}
-          >
-            Complete
-          </Button>
-        </form>
+          <FormikSubmitButton>Complete</FormikSubmitButton>
+        </Form>
       )}
     </Formik>
   );
