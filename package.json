@@ -20,6 +20,7 @@
     "assert": "^2.0.0",
     "baseui": "^11.2.1",
     "crypto-browserify": "^3.12.0",
+    "formik": "^2.2.9",
     "lodash.clonedeep": "^4.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
