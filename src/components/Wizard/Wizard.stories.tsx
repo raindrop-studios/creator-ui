@@ -4,7 +4,12 @@ import { Formik, FormikHelpers } from "formik";
 import * as yup from "yup";
 
 import { Wizard } from ".";
-import { RadioInput, IntegerInput, PublicKeyInput } from "./Inputs";
+import {
+  RadioInput,
+  IntegerInput,
+  PublicKeyInput,
+  DurationInput,
+} from "./Inputs";
 import { SubStepProps } from "./FormStep";
 import { Form, FormikSubmitButton } from "./Form";
 import { Button } from "baseui/button";
@@ -26,10 +31,13 @@ const TeaPreference = ({ data, handleSubmit }: SubStepProps) => {
   type TValues = yup.InferType<typeof schema>;
   return (
     <Formik
-      initialValues={{ likesTea: data?.likesTea }}
+      initialValues={{ likesTea: `${data?.likesTea}` }}
       onSubmit={(values: TValues, actions: FormikHelpers<TValues>) => {
         actions.setSubmitting(true);
-        handleSubmit(values);
+        handleSubmit({
+          likesTea:
+            values.likesTea === "null" ? null : values.likesTea === "true",
+        });
         actions.setSubmitting(false);
       }}
       validationSchema={schema}
@@ -60,6 +68,10 @@ const TeaPreference = ({ data, handleSubmit }: SubStepProps) => {
 const NumberOfCups = ({ handleSubmit, data }: SubStepProps) => {
   const schema = yup.object({
     numCups: yup.number().integer().required().max(12, "That's too much tea!"),
+    time: yup.object({
+      [DurationInput.Units.minutes]: yup.number(),
+      [DurationInput.Units.seconds]: yup.number(),
+    }),
   });
   type TValues = yup.InferType<typeof schema>;
   const submit = (values: TValues) => {
@@ -75,11 +87,20 @@ const NumberOfCups = ({ handleSubmit, data }: SubStepProps) => {
     handleSubmit({
       numCups: values.numCups,
       cups: cupsData,
+      time: DurationInput.toMilliseconds(values.time),
     });
   };
   return (
     <Formik
-      initialValues={{ numCups: data?.numCups }}
+      initialValues={{
+        numCups: data?.numCups,
+        time:
+          data?.time &&
+          DurationInput.toDurationObject(data.time, [
+            DurationInput.Units.minutes,
+            DurationInput.Units.seconds,
+          ]),
+      }}
       onSubmit={(values: TValues, actions: FormikHelpers<TValues>) => {
         actions.setSubmitting(true);
         submit(values);
@@ -98,6 +119,15 @@ const NumberOfCups = ({ handleSubmit, data }: SubStepProps) => {
             onBlur={props.handleBlur}
             value={props.values.numCups}
             error={props.errors.numCups}
+          />
+          <DurationInput.Inline
+            name="time"
+            title="How long do you take to drink a cup of tea?"
+            onChange={props.handleChange}
+            onBlur={props.handleBlur}
+            value={props.values.time}
+            error={props.errors.time}
+            units={[DurationInput.Units.minutes, DurationInput.Units.seconds]}
           />
           <FormikSubmitButton>Next</FormikSubmitButton>
         </Form>
