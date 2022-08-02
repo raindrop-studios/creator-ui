@@ -81,6 +81,6 @@ export default () => {
       setTokenInfo([]);
       setLoading(false);
     }
-  }, [connection, wallet.publicKey, setTokenInfo]);
+  }, [connection, wallet.publicKey]);
   return { loading, tokens: tokenInfo };
 };
