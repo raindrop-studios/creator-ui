@@ -9,6 +9,7 @@ import {
   IntegerInput,
   PublicKeyInput,
   DurationInput,
+  SelectInput,
 } from "./Inputs";
 import { SubStepProps } from "./FormStep";
 import { Form, FormikSubmitButton } from "./Form";
@@ -27,17 +28,18 @@ const TeaPreference = ({ data, handleSubmit }: SubStepProps) => {
   }
   const schema = yup.object({
     likesTea: yup.string().required().oneOf(Object.values(TFN)),
+    flavour: yup.array().of(yup.string().required()).required(),
   });
   type TValues = yup.InferType<typeof schema>;
   return (
     <Formik
-      initialValues={{ likesTea: `${data?.likesTea}` }}
+      initialValues={{ likesTea: `${data?.likesTea}`, flavour: data?.flavour || [] }}
       onSubmit={(values: TValues, actions: FormikHelpers<TValues>) => {
         actions.setSubmitting(true);
         handleSubmit({
-          likesTea:
-            values.likesTea === "null" ? null : values.likesTea === "true",
-        });
+          likesTea: values.likesTea === "null" ? null : values.likesTea === "true",
+          flavour: values.flavour
+         });
         actions.setSubmitting(false);
       }}
       validationSchema={schema}
@@ -58,6 +60,20 @@ const TeaPreference = ({ data, handleSubmit }: SubStepProps) => {
             value={props.values.likesTea}
             error={props.errors.likesTea}
           />
+          {props.values.likesTea === TFN.true && <SelectInput.Formik
+            name="flavour"
+            title="What flavours do you drink?"
+            options={SelectInput.transformOptions([
+              "Green tea",
+              "Earl Grey",
+              "Lapsang Souchong",
+              "Horchata",
+              ...props.values.flavour
+            ])}
+            creatable
+            multi
+            value={props.values.flavour}
+          />}
           <FormikSubmitButton>Next</FormikSubmitButton>
         </Form>
       )}
