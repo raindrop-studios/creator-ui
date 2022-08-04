@@ -9,9 +9,7 @@ import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
-import {
-  WalletModalProvider,
-} from "@solana/wallet-adapter-react-ui";
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import {
   GlowWalletAdapter,
   PhantomWalletAdapter,
@@ -23,8 +21,6 @@ import { BaseProvider, DarkTheme } from "baseui";
 import { Client as Styletron } from "styletron-engine-atomic";
 import { Provider as StyletronProvider } from "styletron-react";
 import useNetwork, { NetworkProvider } from "./hooks/useNetwork";
-
-require("@solana/wallet-adapter-react-ui/styles.css");
 
 export const App: FC = () => {
   return (
