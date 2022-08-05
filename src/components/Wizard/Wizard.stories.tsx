@@ -10,10 +10,12 @@ import {
   PublicKeyInput,
   DurationInput,
   SelectInput,
+  PermissivenessInput,
 } from "./Inputs";
 import { SubStepProps } from "./FormStep";
 import { Form, FormikSubmitButton } from "./Form";
 import { Button } from "baseui/button";
+require("@solana/wallet-adapter-react-ui/styles.css");
 
 export default {
   title: "Wizard",
@@ -28,18 +30,22 @@ const TeaPreference = ({ data, handleSubmit }: SubStepProps) => {
   }
   const schema = yup.object({
     likesTea: yup.string().required().oneOf(Object.values(TFN)),
-    flavour: yup.array().of(yup.string().required()).required(),
+    flavour: yup.array().of(yup.string().defined().required()).required(),
   });
   type TValues = yup.InferType<typeof schema>;
   return (
     <Formik
-      initialValues={{ likesTea: `${data?.likesTea}`, flavour: data?.flavour || [] }}
+      initialValues={{
+        likesTea: `${data?.likesTea}`,
+        flavour: data?.flavour || [],
+      }}
       onSubmit={(values: TValues, actions: FormikHelpers<TValues>) => {
         actions.setSubmitting(true);
         handleSubmit({
-          likesTea: values.likesTea === "null" ? null : values.likesTea === "true",
-          flavour: values.flavour
-         });
+          likesTea:
+            values.likesTea === "null" ? null : values.likesTea === "true",
+          flavour: values.flavour,
+        });
         actions.setSubmitting(false);
       }}
       validationSchema={schema}
@@ -60,20 +66,22 @@ const TeaPreference = ({ data, handleSubmit }: SubStepProps) => {
             value={props.values.likesTea}
             error={props.errors.likesTea}
           />
-          {props.values.likesTea === TFN.true && <SelectInput.Formik
-            name="flavour"
-            title="What flavours do you drink?"
-            options={SelectInput.transformOptions([
-              "Green tea",
-              "Earl Grey",
-              "Lapsang Souchong",
-              "Horchata",
-              ...props.values.flavour
-            ])}
-            creatable
-            multi
-            value={props.values.flavour}
-          />}
+          {props.values.likesTea === TFN.true && (
+            <SelectInput.Formik
+              name="flavour"
+              title="What flavours do you drink?"
+              options={SelectInput.transformOptions([
+                "Green tea",
+                "Earl Grey",
+                "Lapsang Souchong",
+                "Horchata",
+                ...props.values.flavour,
+              ])}
+              creatable
+              multi
+              value={props.values.flavour}
+            />
+          )}
           <FormikSubmitButton>Next</FormikSubmitButton>
         </Form>
       )}
@@ -189,6 +197,38 @@ const CupDetails = ({
   );
 };
 
+const WhoIsAllowed = ({ handleSubmit, data }: SubStepProps) => {
+  const schema = yup.object({
+    allowed: PermissivenessInput.validation.required().min(1),
+  });
+  type TValues = yup.InferType<typeof schema>;
+  return (
+    <Formik
+      initialValues={{
+        allowed: data?.allowed,
+      }}
+      validationSchema={schema}
+      onSubmit={(values: TValues, actions: FormikHelpers<TValues>) => {
+        actions.setSubmitting(true);
+        handleSubmit(values);
+        actions.setSubmitting(false);
+      }}
+    >
+      {(props) => (
+        <Form onSubmit={props.handleSubmit}>
+          <PermissivenessInput.Formik
+            name="allowed"
+            title="Who is allowed to send you tea?"
+            value={props.values.allowed}
+            error={props.errors.allowed}
+          />
+          <FormikSubmitButton>Next</FormikSubmitButton>
+        </Form>
+      )}
+    </Formik>
+  );
+};
+
 const SendReward = ({ handleSubmit, data }: SubStepProps) => {
   const schema = yup.object({
     wallet: PublicKeyInput.validation.required(),
@@ -251,6 +291,7 @@ export const SteppedForm = () => {
             cupNum={index}
           />
         ))}
+      <Wizard.Step title="Who sends it?" hash="whom" Component={WhoIsAllowed} />
       <Wizard.Step
         title="Reward Address"
         hash="send-reward"

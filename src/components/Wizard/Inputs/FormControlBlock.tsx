@@ -25,5 +25,5 @@ export type FormControlBlockProps = {
   title?: FormControlProps["label"];
   help?: FormControlProps["caption"];
   children: React.ReactNode;
-  error?: string | undefined;
+  error?: string | string[] | undefined;
 };
