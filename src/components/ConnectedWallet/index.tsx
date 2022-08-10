@@ -1,4 +1,4 @@
-import React, { FC, Key, ReactNode, useEffect, useMemo, useState } from "react";
+import { FC, ReactNode, useMemo, useState } from "react";
 
 import {
   SolanaMobileWalletAdapter,
@@ -9,7 +9,9 @@ import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
-import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import {
+  WalletModalProvider,
+} from "@solana/wallet-adapter-react-ui";
 import {
   GlowWalletAdapter,
   PhantomWalletAdapter,
@@ -17,37 +19,7 @@ import {
   SolflareWalletAdapter,
   TorusWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
-import { BaseProvider, DarkTheme } from "baseui";
-import { Client as Styletron } from "styletron-engine-atomic";
-import { Provider as StyletronProvider } from "styletron-react";
-import useNetwork, { NetworkProvider } from "./hooks/useNetwork";
-
-export const App: FC = () => {
-  return (
-    <StyletronProvider value={engine}>
-      <BaseProvider theme={DarkTheme}>
-        <Context>
-          <Content />
-        </Context>
-      </BaseProvider>
-    </StyletronProvider>
-  );
-};
-
-const engine = new Styletron();
-
-const Context: FC<{ children: ReactNode }> = ({ children }) => {
-  // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
-  const [selectedNetwork, setSelectedNetwork] = useState<WalletAdapterNetwork>(
-    WalletAdapterNetwork.Devnet
-  );
-  // TODO: Add Network selector toggle
-  return (
-    <NetworkProvider value={selectedNetwork}>
-      <ConnectedWallet>{children}</ConnectedWallet>
-    </NetworkProvider>
-  );
-};
+import useNetwork, { NetworkProvider } from "../../hooks/useNetwork";
 
 const ConnectedWallet = ({ children }: { children: ReactNode }) => {
   const { endpoint, network } = useNetwork();
@@ -78,6 +50,17 @@ const ConnectedWallet = ({ children }: { children: ReactNode }) => {
   );
 };
 
-const Content: FC = () => {
-  return null;
+const ConnectedContext: FC<{ children: ReactNode }> = ({ children }) => {
+  // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
+  const [selectedNetwork, setSelectedNetwork] = useState<WalletAdapterNetwork>(
+    WalletAdapterNetwork.Devnet
+  );
+  // TODO: Add Network selector toggle
+  return (
+    <NetworkProvider value={selectedNetwork}>
+      <ConnectedWallet>{children}</ConnectedWallet>
+    </NetworkProvider>
+  );
 };
+
+export default ConnectedContext;

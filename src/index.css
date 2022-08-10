@@ -1,5 +1,5 @@
 @import './reset.css';
-@import 'npm:@solana/wallet-adapter-react-ui/styles.css';
+@import './@solana/wallet-adapter-react-ui/styles.css';
 
 body {
   margin: 0;
