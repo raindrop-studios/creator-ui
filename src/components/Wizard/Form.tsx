@@ -12,7 +12,12 @@ export function Form({
 }) {
   return (
     <form onSubmit={onSubmit}>
-      <Block display="flex" flexDirection="column" alignItems="flex-end">
+      <Block
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        padding="scale800"
+      >
         {children}
       </Block>
     </form>
@@ -31,7 +36,12 @@ export function SubmitButton({
   children,
 }: SubmitButtonProps) {
   return (
-    <Button type="submit" disabled={disabled} isLoading={isLoading}>
+    <Button
+      type="submit"
+      disabled={disabled}
+      isLoading={isLoading}
+      $style={{ margin: "20px" }}
+    >
       {children}
     </Button>
   );

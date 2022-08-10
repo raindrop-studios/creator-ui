@@ -48,7 +48,12 @@ function Wizard<ComponentProps = {}>({
         }
       });
     setSteps(newSteps);
-    setCurrentStep(newCurrentStep || newSteps[0]);
+    setCurrentStep(
+      newCurrentStep ||
+        (currentStepIndex >= newSteps.length - 1
+          ? newSteps[newSteps.length - 1]
+          : newSteps[0])
+    );
   }, [children, currentStepIndex]);
 
   if (!currentStep) return null;
@@ -68,7 +73,12 @@ function Wizard<ComponentProps = {}>({
   };
   const activeKey = currentStep.hash;
   return (
-    <Grid behavior={BEHAVIOR.fluid}>
+    <Grid
+      behavior={BEHAVIOR.fluid}
+      overrides={{
+        GridWrapper: { style: () => ({ marginTop: "-1px!important" }) },
+      }}
+    >
       <Cell span={12} align={ALIGNMENT.start}>
         <Tabs
           activeKey={activeKey}
@@ -93,7 +103,13 @@ function Wizard<ComponentProps = {}>({
                   isMobile ? null : stepIndex < currentStepIndex ? Check : null
                 }
                 disabled={stepIndex > currentStepIndex}
-                onClick={stepIndex < currentStepIndex ? () => {goToStep(stepIndex)} : null}
+                onClick={
+                  stepIndex < currentStepIndex
+                    ? () => {
+                        goToStep(stepIndex);
+                      }
+                    : null
+                }
               >
                 <StepLayout
                   {...step}

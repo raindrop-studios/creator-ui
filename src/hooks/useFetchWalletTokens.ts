@@ -46,7 +46,7 @@ export type TokenInfo = {
   qty: number;
 };
 
-export default () => {
+const useFetchWalletTokens = () => {
   const wallet = useWallet();
   const { connection } = useConnection();
   const [tokenInfo, setTokenInfo] = React.useState<TokenInfo[]>([]);
@@ -69,3 +69,5 @@ export default () => {
   }, [connection, wallet.publicKey]);
   return { loading, tokens: tokenInfo };
 };
+
+export default useFetchWalletTokens;
