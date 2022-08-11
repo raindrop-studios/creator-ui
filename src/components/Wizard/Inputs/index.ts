@@ -4,3 +4,4 @@ export * as IntegerInput from "./Integer";
 export * as TokenInput from "./Token";
 export * as SelectInput from "./Select";
 export * as DurationInput from "./Duration";
+export * as PermissivenessInput from "./Permissiveness"
