@@ -26,7 +26,7 @@ const HasParent = ({handleSubmit, data}: SubStepProps) => {
               title={`Should ${data?.name || "your item"} be defined...`}
               options={[
                 {
-                  title: "By inherited from an existing item class",
+                  title: "By inheriting from an existing item class",
                   value: "true",
                 },
                 {
