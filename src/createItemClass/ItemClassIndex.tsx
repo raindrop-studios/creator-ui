@@ -6,11 +6,24 @@ import { IntegerInput } from "../components/Wizard/Inputs";
 import useNextItemClassIndex from "../hooks/useNextItemClassIndex";
 import { LoadingMessage } from "../components/LoadingMessage";
 import { LabelSmall } from "baseui/typography";
+import { useConnection } from "@solana/wallet-adapter-react";
+import { getItemClassInfo } from "../hooks/utils";
+import { PublicKey } from "@solana/web3.js";
 
 const ItemClassIndex = ({ handleSubmit, data }: SubStepProps) => {
+  const {connection} = useConnection()
   const { nextIndex, loading } = useNextItemClassIndex(data?.mint);
   const schema = yup.object({
-    index: yup.number().min(0).required(),
+    index: yup.number().min(0).required().test('indexInUse', 'This index is already in use.', async (value) => {
+      if (value) {
+        const mintPublicKey = new PublicKey(data?.mint)
+        const accountInfo = await getItemClassInfo(mintPublicKey, value, connection);
+        if (!accountInfo?.value) {
+          return true
+        }
+      }
+      return false
+    }),
   });
   type TValues = yup.InferType<typeof schema>;
   return loading ? (
