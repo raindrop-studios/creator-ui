@@ -3,6 +3,7 @@ import * as yup from "yup"
 import { SubStepProps } from "../components/Wizard/FormStep"
 import { Form, FormikSubmitButton } from "../components/Wizard/Form";
 import { RadioInput } from "../components/Wizard/Inputs";
+import { getBooleanFromString, getStringFromBoolean } from "../components/Wizard/Inputs/Radio";
 
 const HasParent = ({handleSubmit, data}: SubStepProps) => {
     const schema = yup.object({
@@ -11,10 +12,10 @@ const HasParent = ({handleSubmit, data}: SubStepProps) => {
     type TValues = yup.InferType<typeof schema>;
     return (
       <Formik
-        initialValues={{ hasParent: data?.data?.hasParent }}
+        initialValues={{ hasParent: getStringFromBoolean(data?.hasParent) }}
         onSubmit={(values: TValues, actions: FormikHelpers<TValues>) => {
           actions.setSubmitting(true);
-          handleSubmit({hasParent: values?.hasParent === "true"});
+          handleSubmit({hasParent: getBooleanFromString(values?.hasParent)});
           actions.setSubmitting(false);
         }}
         validationSchema={schema}
