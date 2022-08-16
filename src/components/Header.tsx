@@ -24,7 +24,7 @@ function Header() {
           <Link href="/">Create Item Class</Link>
         </NavigationItem>
         <NavigationItem>
-          <Link href="https://long-banana.gitbook.io/raindrops/">
+          <Link href="https://docs.raindropstudios.xyz/raindrops">
             Documentation
           </Link>
         </NavigationItem>
