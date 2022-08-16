@@ -7,6 +7,7 @@ import * as ItemClassIndex from "./ItemClassIndex";
 import * as HasParent from "./HasParent";
 import * as ParentItemClass from "./ParentItemClass";
 import * as MetadataUpdateAuthority from "./MetadataUpdateAuthority";
+import * as Freebuild from "./Freebuild";
 
 const CreateItemClassWizard = () => {
   const [data, setData] = useState<any>({});
@@ -52,6 +53,11 @@ const CreateItemClassWizard = () => {
           Component={MetadataUpdateAuthority.Component}
         />
       )}
+      <Wizard.Step
+        title={Freebuild.title}
+        hash={Freebuild.hash}
+        Component={Freebuild.Component}
+      />
     </Wizard>
   );
 };
