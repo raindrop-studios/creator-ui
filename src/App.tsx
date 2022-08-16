@@ -4,7 +4,6 @@ import {
   SolanaMobileWalletAdapter,
   createDefaultAuthorizationResultCache,
 } from "@solana-mobile/wallet-adapter-mobile";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import {
   ConnectionProvider,
   WalletProvider,
@@ -20,7 +19,11 @@ import {
 import { BaseProvider, DarkTheme } from "baseui";
 import { Client as Styletron } from "styletron-engine-atomic";
 import { Provider as StyletronProvider } from "styletron-react";
-import useNetwork, { NetworkProvider } from "./hooks/useNetwork";
+import useNetwork, {
+  getNetworkForWalletAdapter,
+  NetworkProvider,
+  Networks,
+} from "./hooks/useNetwork";
 
 export const App: FC = () => {
   return (
@@ -38,12 +41,13 @@ const engine = new Styletron();
 
 const Context: FC<{ children: ReactNode }> = ({ children }) => {
   // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
-  const [selectedNetwork, setSelectedNetwork] = useState<WalletAdapterNetwork>(
-    WalletAdapterNetwork.Devnet
+  const [selectedNetwork, setSelectedNetwork] = useState<Networks>(
+    Networks.Devnet
   );
-  // TODO: Add Network selector toggle
   return (
-    <NetworkProvider value={selectedNetwork}>
+    <NetworkProvider
+      value={{ network: selectedNetwork, setNetwork: setSelectedNetwork }}
+    >
       <ConnectedWallet>{children}</ConnectedWallet>
     </NetworkProvider>
   );
@@ -51,6 +55,7 @@ const Context: FC<{ children: ReactNode }> = ({ children }) => {
 
 const ConnectedWallet = ({ children }: { children: ReactNode }) => {
   const { endpoint, network } = useNetwork();
+  const walletAdapterNetwork = getNetworkForWalletAdapter(network);
 
   // @solana/wallet-adapter-wallets includes all the adapters but supports tree shaking and lazy loading --
   // Only the wallets you configure here will be compiled into your application, and only the dependencies
@@ -64,7 +69,7 @@ const ConnectedWallet = ({ children }: { children: ReactNode }) => {
       new PhantomWalletAdapter(),
       new GlowWalletAdapter(),
       new SlopeWalletAdapter(),
-      new SolflareWalletAdapter({ network }),
+      new SolflareWalletAdapter({ network: walletAdapterNetwork }),
       new TorusWalletAdapter(),
     ],
     [network]
