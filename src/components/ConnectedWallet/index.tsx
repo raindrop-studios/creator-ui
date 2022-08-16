@@ -4,14 +4,11 @@ import {
   SolanaMobileWalletAdapter,
   createDefaultAuthorizationResultCache,
 } from "@solana-mobile/wallet-adapter-mobile";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
-import {
-  WalletModalProvider,
-} from "@solana/wallet-adapter-react-ui";
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import {
   GlowWalletAdapter,
   PhantomWalletAdapter,
@@ -19,7 +16,11 @@ import {
   SolflareWalletAdapter,
   TorusWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
-import useNetwork, { NetworkProvider } from "../../hooks/useNetwork";
+import useNetwork, {
+  getNetworkForWalletAdapter,
+  NetworkProvider,
+  Networks,
+} from "../../hooks/useNetwork";
 
 const ConnectedWallet = ({ children }: { children: ReactNode }) => {
   const { endpoint, network } = useNetwork();
@@ -36,7 +37,9 @@ const ConnectedWallet = ({ children }: { children: ReactNode }) => {
       new PhantomWalletAdapter(),
       new GlowWalletAdapter(),
       new SlopeWalletAdapter(),
-      new SolflareWalletAdapter({ network }),
+      new SolflareWalletAdapter({
+        network: getNetworkForWalletAdapter(network),
+      }),
       new TorusWalletAdapter(),
     ],
     [network]
@@ -51,13 +54,13 @@ const ConnectedWallet = ({ children }: { children: ReactNode }) => {
 };
 
 const ConnectedContext: FC<{ children: ReactNode }> = ({ children }) => {
-  // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
-  const [selectedNetwork, setSelectedNetwork] = useState<WalletAdapterNetwork>(
-    WalletAdapterNetwork.Devnet
+  const [selectedNetwork, setSelectedNetwork] = useState<Networks>(
+    Networks.Devnet
   );
-  // TODO: Add Network selector toggle
   return (
-    <NetworkProvider value={selectedNetwork}>
+    <NetworkProvider
+      value={{ network: selectedNetwork, setNetwork: setSelectedNetwork }}
+    >
       <ConnectedWallet>{children}</ConnectedWallet>
     </NetworkProvider>
   );

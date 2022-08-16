@@ -1,13 +1,13 @@
 import { useFormikContext } from "formik";
 import { FlexGrid, FlexGridItem } from "baseui/flex-grid";
 import { Block } from "baseui/block";
-import { Spinner } from "baseui/icon";
 
 import useFetchWalletTokens from "../../../hooks/useFetchWalletTokens";
 import TokenDisplay from "../../TokenDisplay";
 import { FormControlBlock } from "./FormControlBlock";
 import { InputProps } from "./common";
 import { useMemo } from "react";
+import { LoadingMessage } from "../../LoadingMessage";
 
 export function Inline({
   title,
@@ -35,12 +35,12 @@ export function Inline({
     <FormControlBlock title={title} help={help} error={error}>
       <Block margin="20px" onClick={() => setValue(undefined)}>
         <FlexGrid
-          flexGridColumnCount={[1, 3, 4, 6]}
+          flexGridColumnCount={[1, 3, 5]}
           flexGridColumnGap="scale800"
           flexGridRowGap="scale800"
         >
           {loading ? (
-            <Spinner />
+            <LoadingMessage message="Fetching your NFTs" />
           ) : (
             tokenDisplays
           )}

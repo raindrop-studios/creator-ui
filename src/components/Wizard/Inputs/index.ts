@@ -5,3 +5,5 @@ export * as TokenInput from "./Token";
 export * as SelectInput from "./Select";
 export * as DurationInput from "./Duration";
 export * as PermissivenessInput from "./Permissiveness"
+export * as StringInput from "./String";
+export * as JSONInput from "./JSON";

@@ -11,10 +11,12 @@ import {
   DurationInput,
   SelectInput,
   PermissivenessInput,
+  JSONInput,
 } from "./Inputs";
 import { SubStepProps } from "./FormStep";
 import { Form, FormikSubmitButton } from "./Form";
 import { Button } from "baseui/button";
+import { Block } from "baseui/block";
 require("@solana/wallet-adapter-react-ui/styles.css");
 
 export default {
@@ -257,15 +259,42 @@ const SendReward = ({ handleSubmit, data }: SubStepProps) => {
             value={props.values.wallet}
             error={props.errors.wallet}
           />
-          <FormikSubmitButton>Complete</FormikSubmitButton>
+          <FormikSubmitButton>Next</FormikSubmitButton>
         </Form>
       )}
     </Formik>
   );
 };
 
+const ReviewData = ({ handleSubmit, data }: SubStepProps) => {
+  const submit = () => handleSubmit(data);
+  return (
+    <Block display="flex" flexDirection="column">
+      <JSONInput.Display
+        name="review"
+        title="Review your answers"
+        value={data}
+        disabled
+      />
+      <Button $style={{ margin: "20px", alignSelf: "center" }} onClick={submit}>
+        Complete
+      </Button>
+    </Block>
+  );
+};
+
 export const SteppedForm = () => {
-  const [data, setData] = React.useState<any>({});
+  const dataSchema = yup.object({
+    likesTea: yup.mixed<boolean | null>().required(),
+    numCups: yup.number().min(0),
+    cups: yup.array(
+      yup.object({ temperature: yup.string().oneOf(["hot", "cold"]) })
+    ),
+    time: yup.number(),
+    wallet: PublicKeyInput.validation.required(),
+  });
+  type TData = yup.InferType<typeof dataSchema>;
+  const [data, setData] = React.useState<TData>();
   const printData = () => console.log({ data });
   return (
     <Wizard onComplete={printData} values={data} setValues={setData}>
@@ -297,6 +326,7 @@ export const SteppedForm = () => {
         hash="send-reward"
         Component={SendReward}
       />
+      <Wizard.Step title="Review" hash="review-data" Component={ReviewData} />
     </Wizard>
   );
 };
