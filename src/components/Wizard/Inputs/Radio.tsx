@@ -33,25 +33,35 @@ export function Inline({
 export function Standalone({
   options,
   onSelect,
+  onDeselect,
   value,
   ...innerProps
 }: RadioInputStandaloneProps) {
+  const [touched, setTouched] = React.useState<boolean>(false)
   const [selected, setSelected] = React.useState<number>(
     options.findIndex(({ value: optionValue }) => optionValue === value)
-  );
+    );
   const selectedValue: typeof value =
     selected === -1 ? undefined : options[selected].value;
+  const handleSelect = (value: number) => {
+    setTouched(true);
+    setSelected(value);
+  }
 
   React.useEffect(() => {
-    if (selected !== -1 && selectedValue !== value) {
-      onSelect(selectedValue);
+    if (touched) {
+      if (selected !== -1) {
+        onSelect(selectedValue);
+      } else if (onDeselect) {
+        onDeselect();
+      }
     }
   }, [selectedValue, value]);
   return (
     <Inner
       options={options}
       selected={selected}
-      setSelected={setSelected}
+      setSelected={handleSelect}
       {...innerProps}
     />
   );
@@ -100,6 +110,7 @@ interface RadioInputProps extends InputProps {
 interface RadioInputStandaloneProps
   extends Omit<InnerProps, "selected" | "setSelected"> {
   onSelect: (arg: any) => void;
+  onDeselect?: () => void;
   value: any;
 }
 
