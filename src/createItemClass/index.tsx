@@ -6,6 +6,7 @@ import * as TokenSelect from "./TokenSelect";
 import * as ItemClassIndex from "./ItemClassIndex";
 import * as HasParent from "./HasParent";
 import * as ParentItemClass from "./ParentItemClass";
+import * as MetadataUpdateAuthority from "./MetadataUpdateAuthority";
 
 const CreateItemClassWizard = () => {
   const [data, setData] = useState<any>({});
@@ -38,11 +39,19 @@ const CreateItemClassWizard = () => {
         hash={HasParent.hash}
         Component={HasParent.Component}
       />
-      {data?.hasParent && <Wizard.Step
-        title={ParentItemClass.title}
-        hash={ParentItemClass.hash}
-        Component={ParentItemClass.Component}
-      />}
+      {data?.hasParent ? (
+        <Wizard.Step
+          title={ParentItemClass.title}
+          hash={ParentItemClass.hash}
+          Component={ParentItemClass.Component}
+        />
+      ) : (
+        <Wizard.Step
+          title={MetadataUpdateAuthority.title}
+          hash={MetadataUpdateAuthority.hash}
+          Component={MetadataUpdateAuthority.Component}
+        />
+      )}
     </Wizard>
   );
 };

@@ -13,7 +13,6 @@ const getNextItemClassIndex = async (
   let index;
   for (let i of range(maxTries)) {
     const accountInfo = await getItemClassInfo(tokenMint, i, connection);
-    console.log('owner', accountInfo.value?.owner.toString())
     if (!accountInfo?.value) {
       index = i;
       break;

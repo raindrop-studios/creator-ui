@@ -23,7 +23,7 @@ const ParentItemClass = ({handleSubmit, data}: SubStepProps) => {
           <Form onSubmit={props.handleSubmit}>
             <ItemClassKeyInput.Formik
               name="parent"
-              title="Enter the item class key you want to inherit from"
+              title="Enter the key of the item class you want to inherit from"
               help="Item classes based off a parent will inherit different properties, depending on what was defined in that parent."
               onChange={props.handleChange}
               onBlur={props.handleBlur}
