@@ -83,6 +83,15 @@ function Inner({
         onClick={(_event, index) => {
           setSelected(index === selected ? -1 : index);
         }}
+        overrides={{
+          Root: {
+            style: {
+              width: "fit-content",
+              marginLeft: "auto",
+              marginRight: "auto",
+            },
+          },
+        }}
       >
         {options.map(({ title, value }) => {
           return (
@@ -95,6 +104,28 @@ function Inner({
     </FormControlBlock>
   );
 }
+
+export const getBooleanFromString = (strVal: string) => {
+  switch (strVal) {
+    case "true":
+      return true;
+    case "false":
+      return false;
+    default:
+      return undefined;
+  }
+};
+
+export const getStringFromBoolean = (boolVal: boolean) => {
+  switch (boolVal) {
+    case true:
+      return "true";
+    case false:
+      return "false";
+    default:
+      return "";
+  }
+};
 
 export type RadioOption = {
   title: React.ReactNode;
