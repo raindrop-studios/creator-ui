@@ -11,6 +11,7 @@ import * as MetadataUpdateAuthority from "./MetadataUpdateAuthority";
 import * as Freebuild from "./Freebuild";
 import * as HasUses from "./HasUses";
 import * as Review from "./Review";
+import * as BuilderMustBeHolder from "./BuilderMustBeHolder";
 import useNetwork from "../hooks/useNetwork";
 
 const CreateItemClassWizard = () => {
@@ -82,6 +83,11 @@ const CreateItemClassWizard = () => {
         title={HasUses.title}
         hash={HasUses.hash}
         Component={HasUses.Component}
+      />
+      <Wizard.Step
+        title={BuilderMustBeHolder.title}
+        hash={BuilderMustBeHolder.hash}
+        Component={BuilderMustBeHolder.Component}
       />
       <Wizard.Step
         title={Review.title}
