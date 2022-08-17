@@ -32,7 +32,7 @@ export const useFormWizard = ({
   const goToStep = (step: number) => {
     setCurrentStep(step);
     const newStepHash = steps[step];
-    const stepIndex = history.findIndex(
+    const stepIndex = step === 0 ? 0 : history.findIndex(
       (historicStepHash) => historicStepHash === newStepHash
     );
     if (stepIndex === -1) {

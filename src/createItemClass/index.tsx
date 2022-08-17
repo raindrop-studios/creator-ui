@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Wizard } from "../components/Wizard";
 import * as ConnectWallet from "./ConnectWallet";
 import * as NameItem from "./NameItem";
@@ -8,12 +8,30 @@ import * as HasParent from "./HasParent";
 import * as ParentItemClass from "./ParentItemClass";
 import * as MetadataUpdateAuthority from "./MetadataUpdateAuthority";
 import * as Freebuild from "./Freebuild";
+import useNetwork from "../hooks/useNetwork";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 const CreateItemClassWizard = () => {
+  const { network } = useNetwork();
+  const [restart, setRestart] = useState<Date>();
+  const { disconnect } = useWallet();
   const [data, setData] = useState<any>({});
   const printData = () => console.log({ data });
+  const disconnectAndRestart = async () => {
+    await disconnect();
+    setData({});
+    setRestart(new Date());
+  };
+  useEffect(() => {
+    disconnectAndRestart();
+  }, [network]);
   return (
-    <Wizard onComplete={printData} values={data} setValues={setData}>
+    <Wizard
+      onComplete={printData}
+      values={data}
+      setValues={setData}
+      restartOnChange={restart}
+    >
       <Wizard.Step
         title={ConnectWallet.title}
         hash={ConnectWallet.hash}

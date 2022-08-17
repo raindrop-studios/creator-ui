@@ -5,12 +5,12 @@ import { useEffect } from "react";
 import { SubStepProps } from "../components/Wizard/FormStep"
 
 const ConnectWallet = ({handleSubmit}: SubStepProps) => {
-    const { publicKey } = useWallet();
+    const { publicKey, disconnecting } = useWallet();
     useEffect(() => {
-        if (publicKey) {
-            handleSubmit({connectedWallet: publicKey})
-        }
-    }, [publicKey])
+      if (publicKey && !disconnecting) {
+        handleSubmit({ connectedWallet: publicKey });
+      }
+    }, [publicKey, disconnecting]);
     return (
       <Block maxWidth="400px" alignSelf="center">
         <WalletMultiButton />
