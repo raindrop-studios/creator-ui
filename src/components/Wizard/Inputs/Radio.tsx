@@ -116,7 +116,7 @@ export const getBooleanFromString = (strVal: string) => {
   }
 };
 
-export const getStringFromBoolean = (boolVal: boolean) => {
+export const getStringFromBoolean = (boolVal: boolean | undefined) => {
   switch (boolVal) {
     case true:
       return "true";
