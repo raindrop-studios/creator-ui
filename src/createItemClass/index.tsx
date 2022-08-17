@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { Wizard } from "../components/Wizard";
 import * as ConnectWallet from "./ConnectWallet";
 import * as NameItem from "./NameItem";
@@ -8,8 +9,9 @@ import * as HasParent from "./HasParent";
 import * as ParentItemClass from "./ParentItemClass";
 import * as MetadataUpdateAuthority from "./MetadataUpdateAuthority";
 import * as Freebuild from "./Freebuild";
+import * as HasUses from "./HasUses";
+import * as Review from "./Review";
 import useNetwork from "../hooks/useNetwork";
-import { useWallet } from "@solana/wallet-adapter-react";
 
 const CreateItemClassWizard = () => {
   const { network } = useNetwork();
@@ -76,8 +78,57 @@ const CreateItemClassWizard = () => {
         hash={Freebuild.hash}
         Component={Freebuild.Component}
       />
+      <Wizard.Step
+        title={HasUses.title}
+        hash={HasUses.hash}
+        Component={HasUses.Component}
+      />
+      <Wizard.Step
+        title={Review.title}
+        hash={Review.hash}
+        Component={Review.Component}
+        clean={prepareItemClassConfig}
+      />
     </Wizard>
   );
 };
+
+function prepareItemClassConfig(data: any) {
+  const {metadataUpdateAuthority, mint, itemClassIndex, freeBuild} = data
+  return {
+    data: {
+      settings: {
+        freeBuild: {
+          boolean: freeBuild,
+          inherited: null,
+        },
+      },
+      childrenMustBeEditions: false,
+      builderMustBeHolder: false,
+      updatePermissiveness: null,
+      buildPermissiveness: [],
+      stakingWarmUpDuration: null,
+      stakingCooldownDuration: null,
+      stakingPermissiveness: null,
+      unstakingPermissiveness: null,
+      childUpdatePropagationPermissiveness: [],
+    },
+    config: {
+      usageRoot: null,
+      usageStateRoot: null,
+      componentRoot: null,
+      usages: [],
+      components: [],
+    },
+    metadataUpdateAuthority,
+    storeMint: false,
+    storeMetadataFields: false,
+    mint,
+    index: itemClassIndex,
+    updatePermissivenessToUse: null,
+    namespaceRequirement: 1,
+    totalSpaceBytes: 300,
+  };
+}
 
 export { CreateItemClassWizard };
