@@ -29,8 +29,8 @@ export const FormBlock = ({ children }: { children: React.ReactNode }) => (
 );
 
 type SubmitButtonProps = {
-  isLoading: boolean;
-  disabled: boolean;
+  isLoading?: boolean;
+  disabled?: boolean;
   children: React.ReactNode;
   type?: ButtonProps['type'];
   onClick?: ButtonProps['onClick'];
