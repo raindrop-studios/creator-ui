@@ -15,7 +15,7 @@ const ItemClassIndex = ({ handleSubmit, data }: SubStepProps) => {
   const { nextIndex, loading } = useNextItemClassIndex(data?.mint);
   const schema = yup.object({
     index: yup.number().min(0).required().test('indexInUse', 'This index is already in use.', async (value) => {
-      if (value) {
+      if (value !== undefined) {
         const mintPublicKey = new PublicKey(data?.mint)
         const accountInfo = await getItemClassInfo(mintPublicKey, value, connection);
         if (!accountInfo?.value) {
@@ -30,7 +30,7 @@ const ItemClassIndex = ({ handleSubmit, data }: SubStepProps) => {
     <LoadingItemClass mint={data?.mint} />
   ) : (
     <Formik
-      initialValues={{ index: data?.data?.index || nextIndex || 0 }}
+      initialValues={{ index: data?.index || nextIndex || 0 }}
       onSubmit={(values: TValues, actions: FormikHelpers<TValues>) => {
         actions.setSubmitting(true);
         handleSubmit(values);
