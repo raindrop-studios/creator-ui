@@ -6,9 +6,9 @@ const BuilderMustBeHolder = ({ handleSubmit, data }: SubStepProps) => {
     handleSubmit({ builderMustBeHolder: value });
   return (
     <BooleanFormStep
-      title={`Should item classes based on ${
+      title={`Do you need to hold ${data?.mint} to build ${
         data?.name || "your item"
-      } be built with editions of ${data?.mint} only?`}
+      }?`}
       initialValue={data?.builderMustBeHolder}
       handleSubmit={submitHandler}
     />

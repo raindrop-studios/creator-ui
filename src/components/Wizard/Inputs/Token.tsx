@@ -1,3 +1,4 @@
+import { Metadata } from "@metaplex-foundation/mpl-token-metadata";
 import { useFormikContext } from "formik";
 import { FlexGrid, FlexGridItem } from "baseui/flex-grid";
 import { Block } from "baseui/block";
@@ -15,21 +16,25 @@ export function Inline({
   value,
   error,
   setValue,
+  setMetadataValue,
 }: TokenInputProps) {
   const { loading, tokens } = useFetchWalletTokens();
-  const tokenDisplays = useMemo(() =>
-    tokens.map(({ mintAddr, qty }) => (
-      <FlexGridItem key={`token_${mintAddr}`}>
-        <TokenDisplay
-          mintAddr={mintAddr}
-          selected={mintAddr === value}
-          qty={qty}
-          handleToggleSelect={() =>
-            setValue(value === mintAddr ? undefined : mintAddr)
-          }
-        />
-      </FlexGridItem>
-    )), [tokens, value]
+  const tokenDisplays = useMemo(
+    () =>
+      tokens.map(({ mintAddr, qty }) => (
+        <FlexGridItem key={`token_${mintAddr}`}>
+          <TokenDisplay
+            mintAddr={mintAddr}
+            selected={mintAddr === value}
+            qty={qty}
+            handleToggleSelect={() => {
+              setValue(value === mintAddr ? undefined : mintAddr);
+            }}
+            setMetadata={setMetadataValue}
+          />
+        </FlexGridItem>
+      )),
+    [tokens, value]
   );
   return (
     <FormControlBlock title={title} help={help} error={error}>
@@ -50,15 +55,26 @@ export function Inline({
   );
 }
 
-export function Formik(props: Omit<TokenInputProps, "setValue">) {
+export function Formik(
+  props: Omit<TokenInputProps, "setValue" | "setMetadataValue">
+) {
   const { setFieldValue } = useFormikContext();
   const setValue = (value: string | undefined) =>
     setFieldValue(props.name, value);
-  return <Inline {...props} setValue={setValue} />;
+  const setMetadataValue = (value: Metadata | undefined) =>
+    setFieldValue(`${props.name}_metadata`, value);
+  return (
+    <Inline
+      {...props}
+      setValue={setValue}
+      setMetadataValue={setMetadataValue}
+    />
+  );
 }
 
 export interface TokenInputProps
   extends Omit<InputProps, "onChange" | "onBlur"> {
   value: string | undefined;
   setValue: (arg: string | undefined) => void;
+  setMetadataValue: (arg: Metadata | undefined) => void;
 }

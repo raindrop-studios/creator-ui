@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { TokenStandard } from "@metaplex-foundation/mpl-token-metadata";
 import { Wizard } from "../components/Wizard";
 import * as ConnectWallet from "./ConnectWallet";
 import * as NameItem from "./NameItem";
@@ -12,10 +13,9 @@ import * as Freebuild from "./Freebuild";
 import * as HasUses from "./HasUses";
 import * as Review from "./Review";
 import * as BuilderMustBeHolder from "./BuilderMustBeHolder";
+import * as ChildrenMustBeEditions from "./ChildrenMustBeEditions";
 import useNetwork from "../hooks/useNetwork";
-import {
-  CreateItemClassArgs,
-} from "../hooks/useCreateItemClass";
+import { CreateItemClassArgs } from "../hooks/useCreateItemClass";
 
 const CreateItemClassWizard = () => {
   const { network } = useNetwork();
@@ -31,11 +31,7 @@ const CreateItemClassWizard = () => {
     disconnectAndRestart();
   }, [network]);
   return (
-    <Wizard
-      values={data}
-      setValues={setData}
-      restartOnChange={restart}
-    >
+    <Wizard values={data} setValues={setData} restartOnChange={restart}>
       <Wizard.Step
         title={ConnectWallet.title}
         hash={ConnectWallet.hash}
@@ -90,6 +86,13 @@ const CreateItemClassWizard = () => {
         hash={BuilderMustBeHolder.hash}
         Component={BuilderMustBeHolder.Component}
       />
+      {data?.mint_metadata?.tokenStandard === TokenStandard.NonFungible && (
+        <Wizard.Step
+          title={ChildrenMustBeEditions.title}
+          hash={ChildrenMustBeEditions.hash}
+          Component={ChildrenMustBeEditions.Component}
+        />
+      )}
       <Wizard.Step
         title={Review.title}
         hash={Review.hash}
@@ -100,8 +103,17 @@ const CreateItemClassWizard = () => {
   );
 };
 
-function prepareItemClassConfig(data: ItemClassFormData): CreateItemClassArgs['config'] {
-  const { metadataUpdateAuthority, mint, index, freeBuild } = data;
+function prepareItemClassConfig(
+  data: ItemClassFormData
+): CreateItemClassArgs["config"] {
+  const {
+    metadataUpdateAuthority,
+    mint,
+    index,
+    freeBuild,
+    builderMustBeHolder,
+    childrenMustBeEditions = null,
+  } = data;
   return {
     data: {
       settings: {
@@ -110,8 +122,19 @@ function prepareItemClassConfig(data: ItemClassFormData): CreateItemClassArgs['c
           // @ts-ignore
           inherited: { notInherited: true }, // State.InheritanceState.NotInherited,
         },
-        childrenMustBeEditions: null,
-        builderMustBeHolder: null,
+        // @ts-ignore
+        childrenMustBeEditions:
+          childrenMustBeEditions === null
+            ? null
+            : {
+                boolean: childrenMustBeEditions,
+                inherited: { notInherited: true }, // State.InheritanceState.NotInherited,
+              },
+        builderMustBeHolder: {
+          boolean: builderMustBeHolder,
+          // @ts-ignore
+          inherited: { notInherited: true }, // State.InheritanceState.NotInherited,
+        },
         updatePermissiveness: null,
         buildPermissiveness: [
           {
@@ -164,6 +187,7 @@ type ItemClassFormData = {
   hasUses: boolean;
   metadataUpdateAuthority?: string;
   builderMustBeHolder: boolean;
+  childrenMustBeEditions: boolean;
 };
 
 export { CreateItemClassWizard };
