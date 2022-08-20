@@ -5,13 +5,13 @@ export const useFormWizard = ({
   complete,
 }: {
   steps: string[];
-  complete: () => void;
+  complete?: () => void;
 }) => {
   const [history, setHistory] = useState<string[]>([]);
   const [currentStep, setCurrentStep] = useState<number>(0);
   useEffect(() => {
-    if (currentStep && currentStep == steps.length) {
-      complete();
+    if (currentStep && currentStep === steps.length) {
+      complete?.();
     }
   }, [currentStep]);
   const goToPrevious = () => {

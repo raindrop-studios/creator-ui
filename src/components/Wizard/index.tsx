@@ -135,7 +135,7 @@ function Wizard<ComponentProps = {}>({
 
 type WizardProps = {
   children: React.ReactNode;
-  onComplete: () => void;
+  onComplete?: () => void;
   values: any;
   setValues: (arg: any) => void;
   restartOnChange?: any;

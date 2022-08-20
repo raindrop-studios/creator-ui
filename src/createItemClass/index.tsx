@@ -13,13 +13,15 @@ import * as HasUses from "./HasUses";
 import * as Review from "./Review";
 import * as BuilderMustBeHolder from "./BuilderMustBeHolder";
 import useNetwork from "../hooks/useNetwork";
+import {
+  CreateItemClassArgs,
+} from "../hooks/useCreateItemClass";
 
 const CreateItemClassWizard = () => {
   const { network } = useNetwork();
   const [restart, setRestart] = useState<Date>();
   const { disconnect } = useWallet();
   const [data, setData] = useState<any>({});
-  const printData = () => console.log({ data });
   const disconnectAndRestart = async () => {
     await disconnect();
     setData({});
@@ -30,7 +32,6 @@ const CreateItemClassWizard = () => {
   }, [network]);
   return (
     <Wizard
-      onComplete={printData}
       values={data}
       setValues={setData}
       restartOnChange={restart}
@@ -99,42 +100,70 @@ const CreateItemClassWizard = () => {
   );
 };
 
-function prepareItemClassConfig(data: any) {
-  const {metadataUpdateAuthority, mint, itemClassIndex, freeBuild} = data
+function prepareItemClassConfig(data: ItemClassFormData): CreateItemClassArgs['config'] {
+  const { metadataUpdateAuthority, mint, index, freeBuild } = data;
   return {
     data: {
       settings: {
         freeBuild: {
           boolean: freeBuild,
-          inherited: null,
+          // @ts-ignore
+          inherited: { notInherited: true }, // State.InheritanceState.NotInherited,
         },
+        childrenMustBeEditions: null,
+        builderMustBeHolder: null,
+        updatePermissiveness: null,
+        buildPermissiveness: [
+          {
+            // @ts-ignore
+            permissivenessType: {
+              tokenHolder: true,
+            },
+            // @ts-ignore
+            inherited: {
+              notInherited: true,
+            },
+          },
+        ],
+        stakingWarmUpDuration: null,
+        stakingCooldownDuration: null,
+        stakingPermissiveness: null,
+        unstakingPermissiveness: null,
+        childUpdatePropagationPermissiveness: [],
       },
-      childrenMustBeEditions: false,
-      builderMustBeHolder: false,
-      updatePermissiveness: null,
-      buildPermissiveness: [],
-      stakingWarmUpDuration: null,
-      stakingCooldownDuration: null,
-      stakingPermissiveness: null,
-      unstakingPermissiveness: null,
-      childUpdatePropagationPermissiveness: [],
+      config: {
+        usageRoot: null,
+        usageStateRoot: null,
+        componentRoot: null,
+        usages: [],
+        components: [],
+      },
     },
-    config: {
-      usageRoot: null,
-      usageStateRoot: null,
-      componentRoot: null,
-      usages: [],
-      components: [],
-    },
-    metadataUpdateAuthority,
+    metadataUpdateAuthority: metadataUpdateAuthority || null,
     storeMint: false,
     storeMetadataFields: false,
     mint,
-    index: itemClassIndex,
-    updatePermissivenessToUse: null,
+    index,
+    updatePermissivenessToUse: {
+      tokenHolder: true,
+    },
     namespaceRequirement: 1,
     totalSpaceBytes: 300,
   };
 }
+
+type ItemClassFormData = {
+  connectedWallet: string;
+  name?: string;
+  mint: string;
+  index: number;
+  hasParent: boolean;
+  parentItemClassKey?: string;
+  freeBuild: boolean;
+  hasComponents: boolean;
+  hasUses: boolean;
+  metadataUpdateAuthority?: string;
+  builderMustBeHolder: boolean;
+};
 
 export { CreateItemClassWizard };
