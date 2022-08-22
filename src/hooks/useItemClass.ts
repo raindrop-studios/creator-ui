@@ -52,7 +52,6 @@ const useItemClass = (itemClassKey: string | undefined) => {
           );
           setLoadingState(Loading.Loaded);
         } catch (e) {
-          console.log(e);
           setLoadingState(Loading.Failed);
           setItemClass(undefined)
         }
