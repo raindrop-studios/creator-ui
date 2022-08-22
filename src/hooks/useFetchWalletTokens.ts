@@ -43,7 +43,7 @@ const collateTokenInfoFromAccounts = (accounts: AccountResponse): TokenInfo[] =>
 
 export type TokenInfo = {
   mintAddr: string;
-  qty: number;
+  qty?: number;
 };
 
 const useFetchWalletTokens = () => {
