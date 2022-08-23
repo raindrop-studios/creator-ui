@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import {
   AccountInfo,
@@ -8,6 +8,7 @@ import {
   RpcResponseAndContext,
 } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { Loading } from "./utils";
 
 type AccountResponse = RpcResponseAndContext<
   Array<{
@@ -49,25 +50,30 @@ export type TokenInfo = {
 const useFetchWalletTokens = () => {
   const wallet = useWallet();
   const { connection } = useConnection();
-  const [tokenInfo, setTokenInfo] = React.useState<TokenInfo[]>([]);
-  const [loading, setLoading] = React.useState<boolean>(false);
+  const [tokenInfo, setTokenInfo] = useState<TokenInfo[]>([]);
+  const [loadingState, setLoadingState] = useState<Loading>(Loading.Unloaded);
   useEffect(() => {
     if (wallet.publicKey) {
-      setLoading(true);
-      fetchTokenInfoFromAccounts(
-        connection,
-        wallet.publicKey,
-        (tokenInfo: TokenInfo[]) => {
-          setTokenInfo(tokenInfo);
-          setLoading(false);
-        }
-      );
+      setLoadingState(Loading.Loading);
+      try {
+        fetchTokenInfoFromAccounts(
+          connection,
+          wallet.publicKey,
+          (tokenInfo: TokenInfo[]) => {
+            setTokenInfo(tokenInfo);
+            setLoadingState(Loading.Loaded);
+          }
+        );
+      } catch (e) {
+        setTokenInfo([]);
+        setLoadingState(Loading.Failed);
+      }
     } else {
       setTokenInfo([]);
-      setLoading(false);
+      setLoadingState(Loading.Unloaded);
     }
   }, [connection, wallet.publicKey]);
-  return { loading, tokens: tokenInfo };
+  return { loading: loadingState === Loading.Loading, tokens: tokenInfo };
 };
 
 export default useFetchWalletTokens;

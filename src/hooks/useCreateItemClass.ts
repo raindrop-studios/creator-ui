@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 
 import { BN } from "@project-serum/anchor";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
@@ -7,7 +7,7 @@ import cloneDeep from "lodash.clonedeep";
 import { getItemProgram, State } from "@raindrops-protocol/raindrops";
 
 import useNetwork, { Networks } from "./useNetwork";
-import { getExplorerUrl, ExplorerUrl, getItemClass } from "./utils";
+import { getExplorerUrl, ExplorerUrl, getItemClass, Loading } from "./utils";
 import NodeWallet from "@project-serum/anchor/dist/cjs/nodewallet";
 
 export type ItemClassDefinition = {
@@ -92,8 +92,7 @@ const createItemClass = async ({
 };
 
 const handleCreateItemClass = async ({
-  setLoading,
-  setSuccess,
+  setLoadingState,
   setError,
   setTransactionUrl,
   env,
@@ -102,14 +101,13 @@ const handleCreateItemClass = async ({
   wallet,
   connection,
 }: CreateItemClassArgs & {
-  setLoading: Function;
+  setLoadingState: Function;
   setSuccess: Function;
   setError: Function;
   setTransactionUrl: Function;
 }) => {
   try {
-    setLoading(true);
-    setSuccess(undefined);
+    setLoadingState(Loading.Loading);
     setTransactionUrl(undefined);
     setError(undefined);
     const transactionUrl = await createItemClass({
@@ -119,13 +117,11 @@ const handleCreateItemClass = async ({
       wallet,
       connection,
     });
-    setSuccess(true);
+    setLoadingState(Loading.Loaded);
     setTransactionUrl(transactionUrl);
   } catch (e) {
-    setSuccess(false);
+    setLoadingState(Loading.Failed);
     setError(e);
-  } finally {
-    setLoading(false);
   }
 };
 
@@ -133,17 +129,15 @@ const useCreateItemClass = () => {
   const { network, endpoint } = useNetwork();
   const { connection } = useConnection();
   const wallet = useWallet();
-  const [loading, setLoading] = React.useState<boolean>(false);
-  const [success, setSuccess] = React.useState<boolean | undefined>();
-  const [transactionUrl, setTransactionUrl] = React.useState<ExplorerUrl>();
-  const [error, setError] = React.useState<Error | undefined>();
+  const [loadingState, setLoadingState] = useState<Loading>();
+  const [transactionUrl, setTransactionUrl] = useState<ExplorerUrl>();
+  const [error, setError] = useState<Error | undefined>();
 
   const createItemClassHandler = ({
     config,
   }: Omit<CreateItemClassArgs, "env" | "rpcUrl" | "wallet" | "connection">) =>
     handleCreateItemClass({
-      setLoading,
-      setSuccess,
+      setLoadingState,
       setError,
       setTransactionUrl,
       env: network,
@@ -155,8 +149,8 @@ const useCreateItemClass = () => {
     });
 
   return {
-    loading,
-    success,
+    loading: loadingState === Loading.Loading,
+    success: loadingState === Loading.Loaded,
     error,
     transactionUrl,
     createItemClass: createItemClassHandler,
