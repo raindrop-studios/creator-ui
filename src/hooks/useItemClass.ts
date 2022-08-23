@@ -2,17 +2,8 @@ import { web3 } from "@project-serum/anchor";
 import { State } from "@raindrops-protocol/raindrops";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { useEffect, useState } from "react";
-import { Connection, PublicKey } from "@solana/web3.js";
-import { Loading, withCallback } from "./utils";
-
-const getItemClass = async (
-  itemClassKey: web3.PublicKey,
-  connection: Connection,
-) => {
-  const accountInfo = await connection.getAccountInfo(itemClassKey);
-  if (!accountInfo?.data) return undefined
-  return State.Item.decodeItemClass(accountInfo?.data)
-};
+import { PublicKey } from "@solana/web3.js";
+import { Loading, withCallback, getItemClass } from "./utils";
 
 /**
  * Returns the item class for the given item class key if it exists, else undefined

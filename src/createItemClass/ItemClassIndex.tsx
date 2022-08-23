@@ -18,7 +18,7 @@ const ItemClassIndex = ({ handleSubmit, data }: SubStepProps) => {
       if (value !== undefined) {
         const mintPublicKey = new PublicKey(data?.mint)
         const accountInfo = await getItemClassInfo(mintPublicKey, value, connection);
-        if (!accountInfo?.value) {
+        if (!accountInfo) {
           return true
         }
       }

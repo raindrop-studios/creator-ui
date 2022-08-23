@@ -1,5 +1,5 @@
 import { BN, web3 } from "@project-serum/anchor";
-import { Utils } from "@raindrops-protocol/raindrops";
+import { State, Utils } from "@raindrops-protocol/raindrops";
 import { Connection } from "@solana/web3.js";
 import { Connection as ConnectionUtils } from "@raindrop-studios/sol-kit";
 import { getNetworkForWalletAdapter, Networks } from "./useNetwork";
@@ -16,13 +16,22 @@ export enum Loading {
   Failed = 3,
 }
 
+export const getItemClass = async (
+  itemClassKey: web3.PublicKey,
+  connection: Connection
+) => {
+  const accountInfo = await connection.getAccountInfo(itemClassKey);
+  if (!accountInfo?.data) return undefined;
+  return State.Item.decodeItemClass(accountInfo?.data);
+};
+
 export const getItemClassInfo = async (
   tokenMint: web3.PublicKey,
   index: number,
   connection: Connection
 ) => {
   const [itemClassKey] = await Utils.PDA.getItemPDA(tokenMint, new BN(index));
-  const accountInfo = await connection.getParsedAccountInfo(itemClassKey);
+  const accountInfo = await getItemClass(itemClassKey, connection);
   return accountInfo;
 };
 

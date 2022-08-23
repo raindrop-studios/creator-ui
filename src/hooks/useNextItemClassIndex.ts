@@ -13,7 +13,7 @@ const getNextItemClassIndex = async (
   let index;
   for (let i of range(maxTries)) {
     const accountInfo = await getItemClassInfo(tokenMint, i, connection);
-    if (!accountInfo?.value) {
+    if (!accountInfo) {
       index = i;
       break;
     }
