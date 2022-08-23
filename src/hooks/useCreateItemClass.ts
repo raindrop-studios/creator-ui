@@ -1,13 +1,14 @@
 import React from "react";
 
 import { BN } from "@project-serum/anchor";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { Keypair, PublicKey } from "@solana/web3.js";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { Connection, PublicKey } from "@solana/web3.js";
 import cloneDeep from "lodash.clonedeep";
-import { getItemProgram, State, Utils } from "@raindrops-protocol/raindrops";
+import { getItemProgram, State } from "@raindrops-protocol/raindrops";
 
 import useNetwork, { Networks } from "./useNetwork";
-import { getExplorerUrl, ExplorerUrl } from "./utils";
+import { getExplorerUrl, ExplorerUrl, getItemClass } from "./utils";
+import NodeWallet from "@project-serum/anchor/dist/cjs/nodewallet";
 
 export type ItemClassDefinition = {
   data: State.Item.ItemClassData;
@@ -19,14 +20,16 @@ export type ItemClassDefinition = {
   updatePermissivenessToUse: State.AnchorPermissivenessType | null;
   namespaceRequirement: number;
   totalSpaceBytes: number;
-  parent?: ItemClassDefinition;
+  parent?: State.Item.ItemClass;
+  parentKey?: string;
 };
 
 export type CreateItemClassArgs = {
   env: Networks;
   config: ItemClassDefinition;
   rpcUrl: string;
-  keypair: Keypair;
+  wallet: NodeWallet;
+  connection: Connection;
 };
 
 // Adapted from https://github.com/raindrops-protocol/raindrops/blob/0b52ea858ccdf3a95f2f085f0a9fc21060b33d18/js/src/cli/item.ts#L31
@@ -34,53 +37,54 @@ const createItemClass = async ({
   env,
   config,
   rpcUrl,
-  keypair,
+  wallet,
+  connection,
 }: CreateItemClassArgs) => {
-  const anchorProgram = await getItemProgram(keypair, env, rpcUrl);
-  anchorProgram.asyncSigning = true;
+  const anchorProgram = await getItemProgram(wallet, env, rpcUrl);
+  anchorProgram.asyncSigning = true; // For client signing, set to async
 
-  if (config.data.config.components)
+  if (config.data.config.components) {
     config.data.config.components = config.data.config.components.map((c) => ({
       ...c,
       mint: new PublicKey(c.mint),
       classIndex: new BN(c.classIndex),
       amount: new BN(c.amount),
     }));
+  }
 
-  const {txid} = await anchorProgram.createItemClass(
+  const parentOfParentClassData = config?.parent?.parent
+    ? await getItemClass(config?.parent?.parent, connection)
+    : null;
+  const { txid } = await anchorProgram.createItemClass(
     {
       classIndex: new BN(config.index || 0),
-      parentClassIndex: config.parent ? new BN(config.parent.index) : null,
+      parentClassIndex: null,
       space: new BN(config.totalSpaceBytes),
       desiredNamespaceArraySize: config.namespaceRequirement,
       updatePermissivenessToUse: config.updatePermissivenessToUse,
       storeMint: config.storeMint,
       storeMetadataFields: config.storeMetadataFields,
       itemClassData: config.data as State.Item.ItemClassData,
-      parentOfParentClassIndex: config.parent?.parent
-        ? new BN(config.parent.parent.index)
-        : null,
+      parentOfParentClassIndex: null,
     },
     {
       itemMint: new PublicKey(config.mint),
-      parent: config.parent
-        ? (
-            await Utils.PDA.getItemPDA(
-              new PublicKey(config.parent.mint),
-              new BN(config.parent.index)
-            )
-          )[0]
+      parent: config?.parentKey ? new PublicKey(config?.parentKey) : null,
+      parentMint: config?.parent?.mint
+        ? new PublicKey(config?.parent?.mint)
         : null,
-      parentMint: config.parent ? new PublicKey(config.parent.mint) : null,
-      parentOfParentClassMint: config.parent?.parent
-        ? new PublicKey(config.parent.parent.mint)
+      // @ts-ignore
+      parentOfParentClass: config?.parent?.parent || null,
+      parentOfParentClassMint: parentOfParentClassData?.mint
+        ? new PublicKey(parentOfParentClassData.mint)
         : null,
       metadataUpdateAuthority: config.metadataUpdateAuthority
         ? new PublicKey(config.metadataUpdateAuthority)
-        : keypair.publicKey,
-      parentUpdateAuthority: config.parent
-        ? config.parent.metadataUpdateAuthority
-        : null,
+        : wallet.publicKey,
+      parentUpdateAuthority: null, 
+      // config.parent
+      //  ? config.parent.metadataUpdateAuthority // QUESTION: Where can we get this from?
+      //  : null,
     },
     {}
   );
@@ -95,7 +99,8 @@ const handleCreateItemClass = async ({
   env,
   config,
   rpcUrl,
-  keypair,
+  wallet,
+  connection,
 }: CreateItemClassArgs & {
   setLoading: Function;
   setSuccess: Function;
@@ -111,7 +116,8 @@ const handleCreateItemClass = async ({
       env,
       config: cloneDeep(config),
       rpcUrl,
-      keypair,
+      wallet,
+      connection,
     });
     setSuccess(true);
     setTransactionUrl(transactionUrl);
@@ -125,16 +131,16 @@ const handleCreateItemClass = async ({
 
 const useCreateItemClass = () => {
   const { network, endpoint } = useNetwork();
+  const { connection } = useConnection();
   const wallet = useWallet();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [success, setSuccess] = React.useState<boolean | undefined>();
-  const [transactionUrl, setTransactionUrl] =
-    React.useState<ExplorerUrl>();
+  const [transactionUrl, setTransactionUrl] = React.useState<ExplorerUrl>();
   const [error, setError] = React.useState<Error | undefined>();
 
   const createItemClassHandler = ({
     config,
-  }: Omit<CreateItemClassArgs, "env" | "rpcUrl" | "keypair">) =>
+  }: Omit<CreateItemClassArgs, "env" | "rpcUrl" | "wallet" | "connection">) =>
     handleCreateItemClass({
       setLoading,
       setSuccess,
@@ -143,8 +149,10 @@ const useCreateItemClass = () => {
       env: network,
       config,
       rpcUrl: endpoint,
-      keypair: wallet as unknown as Keypair,
-    }); // Urgh Typescript
+      // @ts-ignore
+      wallet,
+      connection,
+    });
 
   return {
     loading,
