@@ -57,7 +57,6 @@ const useNextItemClassIndex = (tokenMint: string | undefined) => {
           index = await getNextItemClassIndex(currentToken, connection);
           setLoadingState(Loading.Loaded);
         } catch (e) {
-          console.log(e);
           setLoadingState(Loading.Failed);
         }
         return index;
