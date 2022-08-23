@@ -16,6 +16,7 @@ import * as BuilderMustBeHolder from "./BuilderMustBeHolder";
 import * as ChildrenMustBeEditions from "./ChildrenMustBeEditions";
 import useNetwork from "../hooks/useNetwork";
 import { CreateItemClassArgs } from "../hooks/useCreateItemClass";
+import { State } from "@raindrops-protocol/raindrops";
 
 const CreateItemClassWizard = () => {
   const { network } = useNetwork();
@@ -113,6 +114,7 @@ function prepareItemClassConfig(
     freeBuild,
     builderMustBeHolder,
     childrenMustBeEditions = null,
+    parent_itemclass: parentItemClass,
   } = data;
   return {
     data: {
@@ -163,10 +165,11 @@ function prepareItemClassConfig(
       },
     },
     metadataUpdateAuthority: metadataUpdateAuthority || null,
-    storeMint: false,
-    storeMetadataFields: false,
+    storeMint: true,
+    storeMetadataFields: true,
     mint,
     index,
+    parent: parentItemClass,
     updatePermissivenessToUse: {
       tokenHolder: true,
     },
@@ -187,7 +190,9 @@ type ItemClassFormData = {
   hasUses: boolean;
   metadataUpdateAuthority?: string;
   builderMustBeHolder: boolean;
-  childrenMustBeEditions: boolean;
+  childrenMustBeEditions?: boolean;
+  parent?: string;
+  parent_itemclass?: State.Item.ItemClass;
 };
 
 export { CreateItemClassWizard };

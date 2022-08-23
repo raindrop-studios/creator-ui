@@ -7,14 +7,19 @@ import { ItemClassKeyInput, PublicKeyInput } from "../components/Wizard/Inputs";
 const ParentItemClass = ({ handleSubmit, data }: SubStepProps) => {
   const schema = yup.object({
     parent: PublicKeyInput.validation.required(),
+    parent_itemclass: yup.object({
+      mint: PublicKeyInput.validation.required(
+        "Selected item class does not have a mint stored"
+      )
+    })
   });
-  type TValues = yup.InferType<typeof schema>;
+  type TValues = Omit<yup.InferType<typeof schema>, 'parent_itemclass'> & {parent_itemclass?: any};
   return (
     <Formik
-      initialValues={{ parent: data?.parent }}
+      initialValues={{ parent: data?.parent, parent_itemclass: undefined }}
       onSubmit={(values: TValues, actions: FormikHelpers<TValues>) => {
         actions.setSubmitting(true);
-        handleSubmit({ parent: values?.parent });
+        handleSubmit({parent: values?.parent, parentItemClass: values?.parent_itemclass});
         actions.setSubmitting(false);
       }}
       validationSchema={schema}
