@@ -8,7 +8,7 @@ import { InputProps } from "./common";
 import { useFormikContext } from "formik";
 import { Block } from "baseui/block";
 
-const PermissivenessOptions = {
+export const PermissivenessOptions = {
   [State.PermissivenessType.TokenHolder]: {
     title: "Token Holder",
     description: "In order to do the action, the item class NFT must be held.",
@@ -75,6 +75,7 @@ export function Inline({
                   justifyContent: "space-evenly",
                   padding: "15px",
                   flex: 1,
+                  flexBasis: "40%",
                 }),
               },
               Label: {
@@ -99,6 +100,7 @@ export function Inline({
 export function Formik(
   props: Omit<PermissivenessInputProps, "toggleValue" | "value"> & {
     value: string[];
+    singular?: boolean;
   }
 ) {
   const { setFieldValue } = useFormikContext();
@@ -108,7 +110,7 @@ export function Formik(
     if (oldValues.includes(value)) {
       newValues = oldValues.filter((val) => val !== value);
     } else {
-      newValues = [...oldValues, value];
+      newValues = props.singular ? [value] : [...oldValues, value];
     }
     setFieldValue(props.name, newValues);
   };
