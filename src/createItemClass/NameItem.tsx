@@ -11,7 +11,7 @@ const NameItem = ({handleSubmit, data}: SubStepProps) => {
     type TValues = yup.InferType<typeof schema>;
     return (
       <Formik
-        initialValues={{ itemName: data?.data?.itemName }}
+        initialValues={{ itemName: data?.itemName }}
         onSubmit={(values: TValues, actions: FormikHelpers<TValues>) => {
           actions.setSubmitting(true);
           handleSubmit(values);
