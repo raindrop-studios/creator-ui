@@ -40,9 +40,9 @@ export function Inline({
     <FormControlBlock title={title} help={help} error={error}>
       <Block margin="20px" onClick={() => setValue(undefined)}>
         <FlexGrid
-          flexGridColumnCount={[1, 3, 5]}
-          flexGridColumnGap="scale800"
-          flexGridRowGap="scale800"
+          flexGridColumnCount={[1, 3, 4]}
+          flexGridColumnGap="scale600"
+          flexGridRowGap="scale600"
         >
           {loading ? (
             <LoadingMessage message="Fetching your NFTs" />
