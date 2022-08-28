@@ -19,7 +19,10 @@ const ParentItemClass = ({ handleSubmit, data }: SubStepProps) => {
       initialValues={{ parent: data?.parent, parent_itemclass: undefined }}
       onSubmit={(values: TValues, actions: FormikHelpers<TValues>) => {
         actions.setSubmitting(true);
-        handleSubmit({parent: values?.parent, parentItemClass: values?.parent_itemclass});
+        handleSubmit({
+          parent: values?.parent,
+          parent_itemclass: values?.parent_itemclass,
+        });
         actions.setSubmitting(false);
       }}
       validationSchema={schema}
