@@ -7,8 +7,12 @@ import { FormControlBlock } from "./FormControlBlock";
 import { InputProps } from "./common";
 import { useFormikContext } from "formik";
 import { Block } from "baseui/block";
+import { LabelXSmall, LabelSmall } from "baseui/typography";
+import { Alert } from "baseui/icon";
 
-export const PermissivenessOptions = {
+export const PermissivenessOptions: {
+  [permissivenessType: string]: PermissivenessOption;
+} = {
   [State.PermissivenessType.TokenHolder]: {
     title: "Token Holder",
     description: "In order to do the action, the item class NFT must be held.",
@@ -34,9 +38,29 @@ export const PermissivenessOptions = {
   },
 };
 
+const isOptionChecked = (
+  value: PermissivenessInputProps["value"],
+  option: PermissivenessOption
+) => (value ? value.includes(option.value) : false);
+const getInheritanceStatus = (
+  value: PermissivenessInputProps["value"],
+  parentValue: PermissivenessInputProps["parentValue"],
+  option: PermissivenessOption
+) => {
+  const parentHasValueForOption = (parentValue || []).includes(option?.value);
+  if (parentHasValueForOption) {
+    if (isOptionChecked(value, option)) {
+      return State.InheritanceState.Inherited;
+    }
+    return State.InheritanceState.Overridden;
+  }
+  return State.InheritanceState.NotInherited;
+};
+
 export function Inline({
   title,
   value,
+  parentValue,
   error,
   help,
   options,
@@ -48,50 +72,60 @@ export function Inline({
   return (
     <FormControlBlock title={title} help={help} error={error}>
       <Block display="flex" flexWrap $style={{ gap: "10px" }}>
-        {mappedOptions.map(({ value: optionValue, title, description }) => (
-          <Checkbox
-            checked={value && value.includes(optionValue)}
-            // @ts-ignore
-            onChange={(e: Event) => {
-              e.preventDefault();
-              toggleValue(optionValue);
-            }}
-            checkmarkType={STYLE_TYPE.toggle_round}
-            overrides={{
-              Root: {
-                style: ({ $theme, $checked }) => ({
-                  background: $checked
-                    ? $theme.colors.contentInverseSecondary
-                    : $theme.colors.contentInversePrimary,
-                  border: `1px solid ${
-                    $checked
-                      ? $theme.colors.borderSelected
-                      : $theme.colors.borderTransparent
-                  }`,
-                  borderRadius: "5px",
-                  display: "flex",
-                  flexDirection: "column-reverse",
-                  alignItems: "center",
-                  justifyContent: "space-evenly",
-                  padding: "15px",
-                  flex: 1,
-                  flexBasis: "40%",
-                }),
-              },
-              Label: {
-                style: {
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  textAlign: "center",
+        {mappedOptions.map((option) => {
+          const checked = value && isOptionChecked(value, option);
+          const inheritanceState = getInheritanceStatus(
+            value,
+            parentValue,
+            option
+          );
+          return (
+            <Checkbox
+              checked={checked}
+              disabled={false} // TODO: Include Child propagation stuff here
+              // @ts-ignore
+              onChange={(e: Event) => {
+                e.preventDefault();
+                toggleValue(option.value);
+              }}
+              checkmarkType={STYLE_TYPE.toggle_round}
+              overrides={{
+                Root: {
+                  style: ({ $theme, $checked }) => ({
+                    background: $checked
+                      ? $theme.colors.contentInverseSecondary
+                      : $theme.colors.contentInversePrimary,
+                    border: `1px solid ${
+                      $checked
+                        ? $theme.colors.borderSelected
+                        : $theme.colors.borderTransparent
+                    }`,
+                    borderRadius: "5px",
+                    display: "flex",
+                    flexDirection: "column-reverse",
+                    alignItems: "center",
+                    justifyContent: "space-evenly",
+                    padding: "15px",
+                    flex: 1,
+                    flexBasis: "40%",
+                  }),
                 },
-              },
-            }}
-          >
-            {title}
-            <small>{description}</small>
-          </Checkbox>
-        ))}
+                Label: {
+                  style: {
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                },
+              }}
+            >
+              {option.title}
+              <LabelSmall>{option.description}</LabelSmall>
+              <InheritanceAlert inheritanceState={inheritanceState} />
+            </Checkbox>
+          );
+        })}
       </Block>
     </FormControlBlock>
   );
@@ -99,12 +133,12 @@ export function Inline({
 
 export function Formik(
   props: Omit<PermissivenessInputProps, "toggleValue" | "value"> & {
-    value: string[];
+    value: (keyof State.AnchorPermissivenessType)[];
     singular?: boolean;
   }
 ) {
   const { setFieldValue } = useFormikContext();
-  const toggleValue = (value: string) => {
+  const toggleValue = (value: keyof State.AnchorPermissivenessType) => {
     let newValues = [];
     let oldValues = props.value || [];
     if (oldValues.includes(value)) {
@@ -120,8 +154,31 @@ export function Formik(
 interface PermissivenessInputProps
   extends Omit<InputProps, "onChange" | "onBlur"> {
   options?: State.PermissivenessType[];
-  value: string[] | undefined;
-  toggleValue: (arg: string) => void;
+  value: (keyof State.AnchorPermissivenessType)[] | undefined;
+  parentValue?: (keyof State.AnchorPermissivenessType)[] | undefined;
+  toggleValue: (arg: keyof State.AnchorPermissivenessType) => void;
+}
+
+type PermissivenessOption = {
+  title: string;
+  description: string;
+  value: keyof State.AnchorPermissivenessType;
+};
+
+function InheritanceAlert({inheritanceState} : {inheritanceState: State.InheritanceState}) {
+  const getInheritanceText = (state?: State.InheritanceState) => {
+    switch (state) {
+      case State.InheritanceState.Inherited:
+        return "Inherited from parent"
+      case State.InheritanceState.Overridden:
+        return <><Alert overrides={{Svg: {style: {marginRight: "5px"}}}}/>Overridden from parent</>
+      default:
+        return ""
+    }
+  }
+  return (
+    <LabelXSmall $style={{ marginTop: "20px", display: "flex" }}>{getInheritanceText(inheritanceState)}</LabelXSmall>
+    );
 }
 
 export const validation = yup.array(
@@ -130,3 +187,13 @@ export const validation = yup.array(
     .defined()
     .oneOf(Object.values(PermissivenessOptions).map(({ value }) => value))
 );
+
+export const transfromFromItemClassToValue = (
+  permissivenessData: State.Permissiveness[]
+): PermissivenessInputProps["value"] =>
+  permissivenessData.map(
+    ({ permissivenessType }) =>
+      Object.keys(
+        State.toAnchor(permissivenessType, State.PermissivenessType)
+      )?.[0] as keyof State.AnchorPermissivenessType
+  );
