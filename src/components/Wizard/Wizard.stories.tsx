@@ -17,6 +17,8 @@ import { SubStepProps } from "./FormStep";
 import { Form, FormikSubmitButton } from "./Form";
 import { Button } from "baseui/button";
 import { Block } from "baseui/block";
+import { AnchorPermissivenessType } from "@raindrops-protocol/raindrops/build/state";
+import { State } from "@raindrops-protocol/raindrops";
 require("@solana/wallet-adapter-react-ui/styles.css");
 
 export default {
@@ -221,7 +223,10 @@ const WhoIsAllowed = ({ handleSubmit, data }: SubStepProps) => {
           <PermissivenessInput.Formik
             name="allowed"
             title="Who is allowed to send you tea?"
-            value={props.values.allowed}
+            value={props.values.allowed as (keyof AnchorPermissivenessType)[]}
+            permissivenessType={
+              State.ChildUpdatePropagationPermissivenessType.BuildPermissiveness
+            }
             error={props.errors.allowed}
           />
           <FormikSubmitButton>Next</FormikSubmitButton>
