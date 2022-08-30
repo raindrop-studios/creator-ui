@@ -8,15 +8,16 @@ import * as TokenSelect from "./TokenSelect";
 import * as ItemClassIndex from "./ItemClassIndex";
 import * as HasParent from "./HasParent";
 import * as ParentItemClass from "./ParentItemClass";
-import * as MetadataUpdateAuthority from "./MetadataUpdateAuthority";
 import * as Freebuild from "./Freebuild";
 import * as HasUses from "./HasUses";
 import * as Review from "./Review";
-import * as BuilderMustBeHolder from "./BuilderMustBeHolder";
+import * as BuildPermissiveness from "./BuildPermissiveness";
 import * as ChildrenMustBeEditions from "./ChildrenMustBeEditions";
+import * as UpdatePermissiveness from "./UpdatePermissiveness";
 import useNetwork from "../hooks/useNetwork";
 import { CreateItemClassArgs } from "../hooks/useCreateItemClass";
 import { State } from "@raindrops-protocol/raindrops";
+import { PermissivenessArray } from "../components/Wizard/Inputs/Permissiveness";
 
 const CreateItemClassWizard = () => {
   const { network } = useNetwork();
@@ -59,19 +60,23 @@ const CreateItemClassWizard = () => {
         hash={HasParent.hash}
         Component={HasParent.Component}
       />
-      {data?.hasParent ? (
+      {data?.hasParent && (
         <Wizard.Step
           title={ParentItemClass.title}
           hash={ParentItemClass.hash}
           Component={ParentItemClass.Component}
         />
-      ) : (
-        <Wizard.Step
-          title={MetadataUpdateAuthority.title}
-          hash={MetadataUpdateAuthority.hash}
-          Component={MetadataUpdateAuthority.Component}
-        />
       )}
+      <Wizard.Step
+        title={BuildPermissiveness.title}
+        hash={BuildPermissiveness.hash}
+        Component={BuildPermissiveness.Component}
+      />
+      <Wizard.Step
+        title={UpdatePermissiveness.title}
+        hash={UpdatePermissiveness.hash}
+        Component={UpdatePermissiveness.Component}
+      />
       <Wizard.Step
         title={Freebuild.title}
         hash={Freebuild.hash}
@@ -81,11 +86,6 @@ const CreateItemClassWizard = () => {
         title={HasUses.title}
         hash={HasUses.hash}
         Component={HasUses.Component}
-      />
-      <Wizard.Step
-        title={BuilderMustBeHolder.title}
-        hash={BuilderMustBeHolder.hash}
-        Component={BuilderMustBeHolder.Component}
       />
       {data?.mint_metadata?.tokenStandard === TokenStandard.NonFungible && (
         <Wizard.Step
@@ -115,7 +115,14 @@ function prepareItemClassConfig(
     builderMustBeHolder,
     childrenMustBeEditions = null,
     parent_itemclass: parentItemClass,
+    parent,
+    permissivenessToUse = null,
+    buildPermissiveness_array,
+    updatePermissiveness_array,
   } = data;
+  const updatePermissivenessToUse = permissivenessToUse
+    ? { [permissivenessToUse]: true }
+    : null;
   return {
     data: {
       settings: {
@@ -137,19 +144,10 @@ function prepareItemClassConfig(
           // @ts-ignore
           inherited: { notInherited: true }, // State.InheritanceState.NotInherited,
         },
-        updatePermissiveness: null,
-        buildPermissiveness: [
-          {
-            // @ts-ignore
-            permissivenessType: {
-              tokenHolder: true,
-            },
-            // @ts-ignore
-            inherited: {
-              notInherited: true,
-            },
-          },
-        ],
+        // @ts-ignore
+        updatePermissiveness: updatePermissiveness_array || null,
+        // @ts-ignore
+        buildPermissiveness: buildPermissiveness_array || null,
         stakingWarmUpDuration: null,
         stakingCooldownDuration: null,
         stakingPermissiveness: null,
@@ -170,10 +168,9 @@ function prepareItemClassConfig(
     mint,
     index,
     parent: parentItemClass,
-    updatePermissivenessToUse: {
-      tokenHolder: true,
-    },
-    namespaceRequirement: 1,
+    parentKey: parent,
+    updatePermissivenessToUse,
+    namespaceRequirement: 2,
     totalSpaceBytes: 300,
   };
 }
@@ -193,6 +190,9 @@ type ItemClassFormData = {
   childrenMustBeEditions?: boolean;
   parent?: string;
   parent_itemclass?: State.Item.ItemClass;
+  permissivenessToUse: State.PermissivenessType;
+  buildPermissiveness_array: PermissivenessArray;
+  updatePermissiveness_array: PermissivenessArray;
 };
 
 export { CreateItemClassWizard };
