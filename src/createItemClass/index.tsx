@@ -1,23 +1,28 @@
 import { useEffect, useState } from "react";
+
 import { useWallet } from "@solana/wallet-adapter-react";
 import { TokenStandard } from "@metaplex-foundation/mpl-token-metadata";
+import { State } from "@raindrops-protocol/raindrops";
+
+import { PermissivenessArray } from "../components/Wizard/Inputs/Permissiveness";
 import { Wizard } from "../components/Wizard";
+import useNetwork from "../hooks/useNetwork";
+import { CreateItemClassArgs } from "../hooks/useCreateItemClass";
+
 import * as ConnectWallet from "./ConnectWallet";
 import * as NameItem from "./NameItem";
 import * as TokenSelect from "./TokenSelect";
 import * as ItemClassIndex from "./ItemClassIndex";
 import * as HasParent from "./HasParent";
 import * as ParentItemClass from "./ParentItemClass";
+import * as BuildPermissiveness from "./BuildPermissiveness";
+import * as UpdatePermissiveness from "./UpdatePermissiveness";
 import * as Freebuild from "./Freebuild";
 import * as HasUses from "./HasUses";
-import * as Review from "./Review";
-import * as BuildPermissiveness from "./BuildPermissiveness";
+import * as ChildSettings from "./ChildSettings";
 import * as ChildrenMustBeEditions from "./ChildrenMustBeEditions";
-import * as UpdatePermissiveness from "./UpdatePermissiveness";
-import useNetwork from "../hooks/useNetwork";
-import { CreateItemClassArgs } from "../hooks/useCreateItemClass";
-import { State } from "@raindrops-protocol/raindrops";
-import { PermissivenessArray } from "../components/Wizard/Inputs/Permissiveness";
+import * as Review from "./Review";
+import { ChildUpdatePropagationPermissivenessArray } from "../components/Wizard/Inputs/Permissiveness/types";
 
 const CreateItemClassWizard = () => {
   const { network } = useNetwork();
@@ -87,6 +92,11 @@ const CreateItemClassWizard = () => {
         hash={HasUses.hash}
         Component={HasUses.Component}
       />
+      <Wizard.Step
+        title={ChildSettings.title}
+        hash={ChildSettings.hash}
+        Component={ChildSettings.Component}
+      />
       {data?.mint_metadata?.tokenStandard === TokenStandard.NonFungible && (
         <Wizard.Step
           title={ChildrenMustBeEditions.title}
@@ -119,6 +129,7 @@ function prepareItemClassConfig(
     permissivenessToUse = null,
     buildPermissiveness_array,
     updatePermissiveness_array,
+    childUpdatePropagationPermissiveness_array,
   } = data;
   const updatePermissivenessToUse = permissivenessToUse
     ? { [permissivenessToUse]: true }
@@ -152,7 +163,9 @@ function prepareItemClassConfig(
         stakingCooldownDuration: null,
         stakingPermissiveness: null,
         unstakingPermissiveness: null,
-        childUpdatePropagationPermissiveness: [],
+        // @ts-ignore
+        childUpdatePropagationPermissiveness:
+          childUpdatePropagationPermissiveness_array || null,
       },
       config: {
         usageRoot: null,
@@ -193,6 +206,7 @@ type ItemClassFormData = {
   permissivenessToUse: State.PermissivenessType;
   buildPermissiveness_array: PermissivenessArray;
   updatePermissiveness_array: PermissivenessArray;
+  childUpdatePropagationPermissiveness_array: ChildUpdatePropagationPermissivenessArray;
 };
 
 export { CreateItemClassWizard };
