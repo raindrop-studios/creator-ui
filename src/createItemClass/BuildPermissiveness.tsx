@@ -20,8 +20,9 @@ const BuildPermissiveness = ({ handleSubmit, data }: SubStepProps) => {
   const parentBuildPermissiveness =
     parentItemClass?.itemClassData?.settings?.buildPermissiveness;
   const parentValue = parentBuildPermissiveness
-    ? PermissivenessInput.transfromFromItemClassToValue(
-        parentBuildPermissiveness
+    ? PermissivenessInput.transfromToValue(
+        parentBuildPermissiveness,
+        State.ChildUpdatePropagationPermissivenessType.BuildPermissiveness
       )
     : undefined;
   type TValues = Omit<yup.InferType<typeof schema>, "value"> & {
@@ -39,8 +40,9 @@ const BuildPermissiveness = ({ handleSubmit, data }: SubStepProps) => {
           ...values,
           builderMustBeHolder: getBooleanFromString(values.builderMustBeHolder),
           buildPermissiveness_array:
-            PermissivenessInput.transformFromValueToItemClass(
+            PermissivenessInput.transformFromValueToItemClassPermissiveness(
               values.buildPermissiveness as (keyof State.AnchorPermissivenessType)[],
+              State.ChildUpdatePropagationPermissivenessType.BuildPermissiveness,
               parentItemClass
             ),
         });

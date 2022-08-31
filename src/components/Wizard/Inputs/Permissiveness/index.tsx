@@ -8,15 +8,17 @@ import { Block } from "baseui/block";
 import { LabelSmall } from "baseui/typography";
 import { Alert } from "baseui/icon";
 import { KIND, Notification } from "baseui/notification";
-import { PermissivenessArray, PermissivenessInputProps } from "./types";
+import { PermissivenessArray, PermissivenessInputProps, PermissivenessOption } from "./types";
 import { PermissivenessOptions } from "./constants";
 import {
   getInheritanceStatus,
   getParentItemClassProperties,
   isOptionChecked,
-  transformFromValueToItemClass,
-  transfromFromItemClassToValue,
+  transfromToValue,
+  transformFromValueToItemClassChildUpdatePropagation,
+  transformFromValueToItemClassPermissiveness,
   validation,
+  getOptions,
 } from "./utils";
 import InheritanceAlert from "./InheritanceAlert";
 
@@ -29,25 +31,43 @@ export function Inline({
   parentItemClass,
   permissivenessType,
 }: PermissivenessInputProps) {
-  const permissivenessOptions = parentItemClass
-    ? [
-        State.PermissivenessType.TokenHolder,
-        State.PermissivenessType.ParentTokenHolder,
-        State.PermissivenessType.UpdateAuthority,
-        State.PermissivenessType.Anybody,
-      ]
-    : [
-        State.PermissivenessType.TokenHolder,
-        State.PermissivenessType.UpdateAuthority,
-        State.PermissivenessType.Anybody,
-      ];
-  const { parentValue, overridden } = getParentItemClassProperties(
-    parentItemClass,
-    permissivenessType
-  );
-  const mappedOptions = permissivenessOptions.map(
-    (key) => PermissivenessOptions[key]
-  );
+  const permissivenessOptions =
+    permissivenessType ===
+    State.ChildUpdatePropagationPermissivenessType
+      .ChildUpdatePropagationPermissiveness
+      ? [
+          State.ChildUpdatePropagationPermissivenessType.BuildPermissiveness,
+          State.ChildUpdatePropagationPermissivenessType
+            .BuilderMustBeHolderPermissiveness,
+          State.ChildUpdatePropagationPermissivenessType
+            .ChildUpdatePropagationPermissiveness,
+          State.ChildUpdatePropagationPermissivenessType
+            .ChildrenMustBeEditionsPermissiveness,
+          State.ChildUpdatePropagationPermissivenessType.Components,
+          State.ChildUpdatePropagationPermissivenessType
+            .FreeBuildPermissiveness,
+          State.ChildUpdatePropagationPermissivenessType.Namespaces,
+          State.ChildUpdatePropagationPermissivenessType.StakingPermissiveness,
+          State.ChildUpdatePropagationPermissivenessType.UpdatePermissiveness,
+          State.ChildUpdatePropagationPermissivenessType.Usages,
+        ]
+      : parentItemClass
+      ? [
+          State.PermissivenessType.TokenHolder,
+          State.PermissivenessType.ParentTokenHolder,
+          State.PermissivenessType.UpdateAuthority,
+          State.PermissivenessType.Anybody,
+        ]
+      : [
+          State.PermissivenessType.TokenHolder,
+          State.PermissivenessType.UpdateAuthority,
+          State.PermissivenessType.Anybody,
+        ];
+  const { parentValue = undefined, overridden = false } =
+    parentItemClass && permissivenessType
+      ? getParentItemClassProperties(parentItemClass, permissivenessType)
+      : {};
+  const mappedOptions = getOptions(permissivenessOptions, permissivenessType);
   return (
     <FormControlBlock title={title} help={help} error={error}>
       <Block display="flex" flexWrap $style={{ gap: "10px" }}>
@@ -130,12 +150,12 @@ export function Inline({
 
 export function Formik(
   props: Omit<PermissivenessInputProps, "toggleValue" | "value"> & {
-    value: (keyof State.AnchorPermissivenessType)[];
+    value: PermissivenessOption["value"][];
     singular?: boolean;
   }
 ) {
   const { setFieldValue } = useFormikContext();
-  const toggleValue = (value: keyof State.AnchorPermissivenessType) => {
+  const toggleValue = (value: PermissivenessOption["value"]) => {
     let newValues = [];
     let oldValues = props.value || [];
     if (oldValues.includes(value)) {
@@ -151,7 +171,8 @@ export function Formik(
 export {
   validation,
   PermissivenessOptions,
-  transformFromValueToItemClass,
-  transfromFromItemClassToValue,
+  transfromToValue,
+  transformFromValueToItemClassPermissiveness,
+  transformFromValueToItemClassChildUpdatePropagation,
 };
 export type { PermissivenessArray };

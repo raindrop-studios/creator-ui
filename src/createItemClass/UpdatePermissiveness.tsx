@@ -21,8 +21,9 @@ const UpdatePermissiveness = ({ handleSubmit, data }: SubStepProps) => {
   const parentUpdatePermissiveness =
     parentItemClass?.itemClassData?.settings?.updatePermissiveness;
   const parentValue = parentUpdatePermissiveness
-    ? PermissivenessInput.transfromFromItemClassToValue(
-        parentUpdatePermissiveness
+    ? PermissivenessInput.transfromToValue(
+        parentUpdatePermissiveness,
+        State.ChildUpdatePropagationPermissivenessType.UpdatePermissiveness
       )
     : undefined;
   type TValues = yup.InferType<typeof schema>;
@@ -38,8 +39,9 @@ const UpdatePermissiveness = ({ handleSubmit, data }: SubStepProps) => {
         handleSubmit({
           ...values,
           updatePermissiveness_array:
-            PermissivenessInput.transformFromValueToItemClass(
+            PermissivenessInput.transformFromValueToItemClassPermissiveness(
               values.updatePermissiveness as (keyof State.AnchorPermissivenessType)[],
+              State.ChildUpdatePropagationPermissivenessType.UpdatePermissiveness,
               parentItemClass
             ),
           permissivenessToUse:
