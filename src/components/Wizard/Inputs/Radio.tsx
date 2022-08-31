@@ -33,25 +33,35 @@ export function Inline({
 export function Standalone({
   options,
   onSelect,
+  onDeselect,
   value,
   ...innerProps
 }: RadioInputStandaloneProps) {
+  const [touched, setTouched] = React.useState<boolean>(false)
   const [selected, setSelected] = React.useState<number>(
     options.findIndex(({ value: optionValue }) => optionValue === value)
-  );
+    );
   const selectedValue: typeof value =
     selected === -1 ? undefined : options[selected].value;
+  const handleSelect = (value: number) => {
+    setTouched(true);
+    setSelected(value);
+  }
 
   React.useEffect(() => {
-    if (selected !== -1 && selectedValue !== value) {
-      onSelect(selectedValue);
+    if (touched) {
+      if (selected !== -1) {
+        onSelect(selectedValue);
+      } else if (onDeselect) {
+        onDeselect();
+      }
     }
   }, [selectedValue, value]);
   return (
     <Inner
       options={options}
       selected={selected}
-      setSelected={setSelected}
+      setSelected={handleSelect}
       {...innerProps}
     />
   );
@@ -73,6 +83,15 @@ function Inner({
         onClick={(_event, index) => {
           setSelected(index === selected ? -1 : index);
         }}
+        overrides={{
+          Root: {
+            style: {
+              width: "fit-content",
+              marginLeft: "auto",
+              marginRight: "auto",
+            },
+          },
+        }}
       >
         {options.map(({ title, value }) => {
           return (
@@ -85,6 +104,28 @@ function Inner({
     </FormControlBlock>
   );
 }
+
+export const getBooleanFromString = (strVal: string) => {
+  switch (strVal) {
+    case "true":
+      return true;
+    case "false":
+      return false;
+    default:
+      return undefined;
+  }
+};
+
+export const getStringFromBoolean = (boolVal: boolean | undefined) => {
+  switch (boolVal) {
+    case true:
+      return "true";
+    case false:
+      return "false";
+    default:
+      return "";
+  }
+};
 
 export type RadioOption = {
   title: React.ReactNode;
@@ -100,6 +141,7 @@ interface RadioInputProps extends InputProps {
 interface RadioInputStandaloneProps
   extends Omit<InnerProps, "selected" | "setSelected"> {
   onSelect: (arg: any) => void;
+  onDeselect?: () => void;
   value: any;
 }
 

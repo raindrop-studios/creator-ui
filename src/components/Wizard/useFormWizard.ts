@@ -5,13 +5,13 @@ export const useFormWizard = ({
   complete,
 }: {
   steps: string[];
-  complete: () => void;
+  complete?: () => void;
 }) => {
   const [history, setHistory] = useState<string[]>([]);
   const [currentStep, setCurrentStep] = useState<number>(0);
   useEffect(() => {
-    if (currentStep && currentStep == steps.length) {
-      complete();
+    if (currentStep && currentStep === steps.length) {
+      complete?.();
     }
   }, [currentStep]);
   const goToPrevious = () => {
@@ -32,7 +32,7 @@ export const useFormWizard = ({
   const goToStep = (step: number) => {
     setCurrentStep(step);
     const newStepHash = steps[step];
-    const stepIndex = history.findIndex(
+    const stepIndex = step === 0 ? 0 : history.findIndex(
       (historicStepHash) => historicStepHash === newStepHash
     );
     if (stepIndex === -1) {

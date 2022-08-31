@@ -14,6 +14,7 @@ function Wizard<ComponentProps = {}>({
   onComplete,
   values,
   setValues,
+  restartOnChange,
 }: WizardProps) {
   const { isMobile } = useDevice();
   const [steps, setSteps] = React.useState<StepProps<ComponentProps>[]>([]);
@@ -55,6 +56,10 @@ function Wizard<ComponentProps = {}>({
           : newSteps[0])
     );
   }, [children, currentStepIndex]);
+
+  React.useEffect(() => {
+    goToStep(0)
+  }, [restartOnChange])
 
   if (!currentStep) return null;
   const { onPrevious, onNext } = currentStep;
@@ -130,9 +135,10 @@ function Wizard<ComponentProps = {}>({
 
 type WizardProps = {
   children: React.ReactNode;
-  onComplete: () => void;
+  onComplete?: () => void;
   values: any;
   setValues: (arg: any) => void;
+  restartOnChange?: any;
 };
 
 Wizard.Step = FormStep;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Block } from "baseui/block";
 import { Button, KIND } from "baseui/button";
 import { ArrowLeft } from "baseui/icon";
@@ -19,9 +19,13 @@ export function StepLayout<ComponentProps = {}>({
   setValues,
   ...componentProps
 }: StepLayoutProps<ComponentProps>) {
+  const [submitting, setSubmitting] = useState<boolean>(false);
   const onSubmit = (arg: any) => {
-    setValues({ ...values, ...arg });
-    next();
+    if (!submitting) { // Ensure each step can only submit ONCE
+      setSubmitting(true)
+      setValues({ ...values, ...arg });
+      next();
+    }
   };
   return (
     <Block

@@ -7,3 +7,5 @@ export * as DurationInput from "./Duration";
 export * as PermissivenessInput from "./Permissiveness"
 export * as StringInput from "./String";
 export * as JSONInput from "./JSON";
+export * as ItemClassKeyInput from "./ItemClassKey";
+export * as TokenMintInput from "./TokenMint";

@@ -18,7 +18,11 @@ const TokenDisplay = ({
   qty,
   selected,
   handleToggleSelect,
-}: TokenInfo & Omit<LoadedTokenProps, "imageSrc" | "tokenName">) => {
+  setMetadata: setMetadataValue,
+}: TokenInfo &
+  Omit<LoadedTokenProps, "imageSrc" | "tokenName"> & {
+    setMetadata: (arg: Metadata | undefined) => void;
+  }) => {
   const { connection } = useConnection();
   const [metadata, setMetadata] = React.useState<Metadata>();
   const [loadingMetadata, setLoadingMetadata] = React.useState(true);
@@ -30,6 +34,11 @@ const TokenDisplay = ({
       setLoadingMetadata(false);
     });
   }, [connection, mintAddr]);
+  useEffect(() => {
+    if (selected && !loadingMetadata) {
+      setMetadataValue(metadata);
+    }
+  }, [selected, loadingMetadata]);
   const [imageSrc, setImageSrc] = React.useState<string>();
   const [, setLoadingImage] = React.useState(true);
   useEffect(() => {
@@ -42,13 +51,16 @@ const TokenDisplay = ({
       });
     }
   }, [metadata]);
+  const toggleSelect = handleToggleSelect
+    ? () => handleToggleSelect()
+    : undefined;
   return (
     <>
       {metadata ? (
         <LoadedToken
           imageSrc={imageSrc}
           tokenName={metadata.data.name}
-          handleToggleSelect={handleToggleSelect}
+          handleToggleSelect={toggleSelect}
           qty={qty}
           selected={selected}
         />
