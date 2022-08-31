@@ -80,6 +80,7 @@ export function Inline({
           );
           return (
             <Checkbox
+              key={`checkbox-permissiveness-${option.value}`}
               checked={checked}
               disabled={overridden}
               // @ts-ignore
