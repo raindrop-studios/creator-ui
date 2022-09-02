@@ -52,6 +52,7 @@ export function SubmitButton({
       isLoading={isLoading}
       $style={{
         margin: "auto",
+        marginTop: "40px",
         maxWidth: "350px",
         width: "100%",
         alignSelf: "center",

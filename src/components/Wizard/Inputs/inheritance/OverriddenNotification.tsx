@@ -5,7 +5,7 @@ const OverriddenNotification = () => (
   <Notification
     kind={KIND.info}
     overrides={{
-      Body: { style: { flexBasis: "100%" } },
+      Body: { style: { flexBasis: "100%", width: "auto" } },
       InnerContainer: {
         style: { display: "flex", alignItems: "center" },
       },

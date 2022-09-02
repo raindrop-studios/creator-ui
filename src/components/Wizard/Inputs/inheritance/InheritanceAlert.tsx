@@ -25,7 +25,7 @@ function InheritanceAlert({
     }
   };
   return (
-    <LabelXSmall $style={{ marginTop: "20px", display: "flex" }}>
+    <LabelXSmall $style={{ marginTop: "20px", display: "flex", alignSelf: "center" }}>
       {getInheritanceText(inheritanceState)}
     </LabelXSmall>
   );

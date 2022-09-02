@@ -6,6 +6,9 @@ import { RadioGroup, Radio } from "baseui/radio";
 
 import { FormControlBlock, FormControlBlockProps } from "./FormControlBlock";
 import { InputProps } from "./common";
+import { getInheritanceState } from "./inheritance/utils";
+import OverriddenNotification from "./inheritance/OverriddenNotification";
+import InheritanceAlert from "./inheritance/InheritanceAlert";
 
 export function Inline({
   title,
@@ -16,17 +19,59 @@ export function Inline({
   onBlur,
   value,
   error,
+  children,
+  disabled,
 }: RadioInputProps) {
   return (
     <FormControlBlock title={title} help={help} error={error}>
-      <RadioGroup name={name} onChange={onChange} onBlur={onBlur} value={value}>
-        {options.map(({ title, value, description }) => (
-          <Radio value={value} description={description} key={`option_${name}_${value}`}>
-            {title}
-          </Radio>
-        ))}
-      </RadioGroup>
+      <>
+        <RadioGroup
+          name={name}
+          onChange={onChange}
+          onBlur={onBlur}
+          value={value}
+          disabled={disabled}
+        >
+          {options.map(({ title, value, description }) => (
+            <Radio
+              value={value}
+              description={description}
+              key={`option_${name}_${value}`}
+            >
+              {title}
+            </Radio>
+          ))}
+        </RadioGroup>
+        {children}
+      </>
     </FormControlBlock>
+  );
+}
+
+export function InheritedBoolean({
+  parentValue,
+  overridden,
+  trueValue,
+  falseValue,
+  ...props
+}: RadioInputProps & {
+  parentValue?: boolean;
+  overridden?: boolean;
+  trueValue: RadioInputProps["value"];
+  falseValue: RadioInputProps["value"];
+}) {
+  const inheritanceState = getInheritanceState(
+    props.value === trueValue || false,
+    parentValue
+  );
+  return (
+    <Inline {...props} disabled={overridden}>
+      {overridden ? (
+        <OverriddenNotification />
+      ) : (
+        <InheritanceAlert inheritanceState={inheritanceState} />
+      )}
+    </Inline>
   );
 }
 
@@ -73,12 +118,14 @@ function Inner({
   help,
   selected,
   setSelected,
+  disabled,
   error,
 }: InnerProps) {
   return (
     <FormControlBlock title={title} help={help} error={error}>
       <ButtonGroup
         mode={MODE.radio}
+        disabled={disabled}
         selected={selected}
         onClick={(_event, index) => {
           setSelected(index === selected ? -1 : index);
@@ -136,6 +183,8 @@ export type RadioOption = {
 interface RadioInputProps extends InputProps {
   options: RadioOption[];
   value: string | undefined;
+  children?: React.ReactNode;
+  disabled?: boolean;
 }
 
 interface RadioInputStandaloneProps
@@ -149,4 +198,5 @@ interface InnerProps extends Omit<FormControlBlockProps, "children"> {
   options: RadioOption[];
   selected: number;
   setSelected: (arg: number) => void;
+  disabled?: boolean;
 }
