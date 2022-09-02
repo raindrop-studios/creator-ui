@@ -3,7 +3,7 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { useEffect, useState } from "react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { range } from "lodash";
-import { getItemClassExists, Loading, withCallback } from "./utils";
+import { doesItemClassExist, Loading, withCallback } from "./utils";
 
 const getNextItemClassIndex = async (
   tokenMint: web3.PublicKey,
@@ -12,8 +12,8 @@ const getNextItemClassIndex = async (
 ) => {
   let index;
   for (let i of range(maxTries)) {
-    const accountInfo = await getItemClassExists(tokenMint, i, connection);
-    if (!accountInfo) {
+    const itemClassExists = await doesItemClassExist(tokenMint, i, connection);
+    if (!itemClassExists) {
       index = i;
       break;
     }
