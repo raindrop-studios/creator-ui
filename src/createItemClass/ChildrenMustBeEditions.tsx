@@ -1,15 +1,31 @@
 import React from "react";
+import { State } from "@raindrops-protocol/raindrops";
 import { SubStepProps } from "../components/Wizard/FormStep";
-import { BooleanFormStep } from "../components/Wizard/BooleanFormStep";
+import { InheritedBooleanFormStep } from "../components/Wizard/BooleanFormStep";
 
 const ChildrenMustBeEditions = ({ handleSubmit, data }: SubStepProps) => {
-  const submitHandler = (value: string) => handleSubmit({ childrenMustBeEditions: value });
+  const submitHandler = ({
+    value,
+    inheritedBoolean,
+  }: {
+    value: boolean;
+    inheritedBoolean: State.InheritedBoolean;
+  }) =>
+    handleSubmit({
+      childrenMustBeEditions: value,
+      childrenMustBeEditions_inheritedboolean: inheritedBoolean,
+    });
   return (
-    <BooleanFormStep
+    <InheritedBooleanFormStep
       title={`Should item classes based on ${
         data?.name || "your item"
       } be built with editions of ${data?.mint} only?`}
       initialValue={data?.childrenMustBeEditions}
+      parentItemClass={data?.parent_itemclass}
+      permissivenessType={
+        State.ChildUpdatePropagationPermissivenessType
+          .ChildrenMustBeEditionsPermissiveness
+      }
       handleSubmit={submitHandler}
     />
   );

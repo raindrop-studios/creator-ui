@@ -121,9 +121,10 @@ function prepareItemClassConfig(
     metadataUpdateAuthority,
     mint,
     index,
-    freeBuild,
-    builderMustBeHolder,
+    freeBuild_inheritedboolean,
+    builderMustBeHolder_inheritedboolean,
     childrenMustBeEditions = null,
+    childrenMustBeEditions_inheritedboolean,
     parent_itemclass: parentItemClass,
     parent,
     permissivenessToUse = null,
@@ -137,24 +138,13 @@ function prepareItemClassConfig(
   return {
     data: {
       settings: {
-        freeBuild: {
-          boolean: freeBuild,
-          // @ts-ignore
-          inherited: { notInherited: true }, // State.InheritanceState.NotInherited,
-        },
+        freeBuild: freeBuild_inheritedboolean,
         // @ts-ignore
         childrenMustBeEditions:
           childrenMustBeEditions === null
             ? null
-            : {
-                boolean: childrenMustBeEditions,
-                inherited: { notInherited: true }, // State.InheritanceState.NotInherited,
-              },
-        builderMustBeHolder: {
-          boolean: builderMustBeHolder,
-          // @ts-ignore
-          inherited: { notInherited: true }, // State.InheritanceState.NotInherited,
-        },
+            : childrenMustBeEditions_inheritedboolean,
+        builderMustBeHolder: builderMustBeHolder_inheritedboolean,
         // @ts-ignore
         updatePermissiveness: updatePermissiveness_array || null,
         // @ts-ignore
@@ -183,7 +173,7 @@ function prepareItemClassConfig(
     parent: parentItemClass,
     parentKey: parent,
     updatePermissivenessToUse,
-    namespaceRequirement: 2,
+    namespaceRequirement: 1,
     totalSpaceBytes: 300,
   };
 }
@@ -196,11 +186,14 @@ type ItemClassFormData = {
   hasParent: boolean;
   parentItemClassKey?: string;
   freeBuild: boolean;
+  freeBuild_inheritedboolean: State.InheritedBoolean;
   hasComponents: boolean;
   hasUses: boolean;
   metadataUpdateAuthority?: string;
   builderMustBeHolder: boolean;
+  builderMustBeHolder_inheritedboolean: State.InheritedBoolean;
   childrenMustBeEditions?: boolean;
+  childrenMustBeEditions_inheritedboolean?: State.InheritedBoolean;
   parent?: string;
   parent_itemclass?: State.Item.ItemClass;
   permissivenessToUse: State.PermissivenessType;

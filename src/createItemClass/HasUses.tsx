@@ -2,7 +2,7 @@ import { SubStepProps } from "../components/Wizard/FormStep"
 import { BooleanFormStep } from "../components/Wizard/BooleanFormStep";
 
 const HasUses = ({handleSubmit, data}: SubStepProps) => {
-  const submitHandler = (value: string) => handleSubmit({ hasUses: value });
+  const submitHandler = (value: boolean | undefined) => handleSubmit({ hasUses: value });
   return (
     <BooleanFormStep
       title={`Does ${data?.name || "your item"} have any uses?`}

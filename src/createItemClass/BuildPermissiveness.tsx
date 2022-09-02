@@ -9,6 +9,10 @@ import {
 import { SubStepProps } from "../components/Wizard/FormStep";
 import { Form, FormikSubmitButton } from "../components/Wizard/Form";
 import { PermissivenessInput, RadioInput } from "../components/Wizard/Inputs";
+import {
+  getInheritedBooleanValue,
+  getParentState,
+} from "../components/Wizard/Inputs/inheritance/utils";
 
 const BuildPermissiveness = ({ handleSubmit, data }: SubStepProps) => {
   const schema = yup.object({
@@ -25,6 +29,14 @@ const BuildPermissiveness = ({ handleSubmit, data }: SubStepProps) => {
         State.ChildUpdatePropagationPermissivenessType.BuildPermissiveness
       )
     : undefined;
+  const {
+    parentValue: builderMustBeHolderParentValue,
+    overridden: builderMustBeHolderOverridden,
+  } = getParentState(
+    State.ChildUpdatePropagationPermissivenessType
+      .BuilderMustBeHolderPermissiveness,
+    parentItemClass
+  );
   type TValues = Omit<yup.InferType<typeof schema>, "value"> & {
     value?: (keyof State.AnchorPermissivenessType)[];
   };
@@ -32,17 +44,30 @@ const BuildPermissiveness = ({ handleSubmit, data }: SubStepProps) => {
     <Formik
       initialValues={{
         buildPermissiveness: data?.buildPermissiveness || parentValue,
-        builderMustBeHolder: getStringFromBoolean(data?.builderMustBeHolder),
+        builderMustBeHolder: getStringFromBoolean(
+          data?.builderMustBeHolder || builderMustBeHolderParentValue
+        ),
       }}
       onSubmit={(values: TValues, actions: FormikHelpers<TValues>) => {
         actions.setSubmitting(true);
+        const builderMustBeHolder = getBooleanFromString(
+          values.builderMustBeHolder
+        );
+        const builderMustBeHolderInheritedBoolean = getInheritedBooleanValue(
+          builderMustBeHolder || false,
+          builderMustBeHolderParentValue,
+          builderMustBeHolderOverridden
+        );
         handleSubmit({
           ...values,
-          builderMustBeHolder: getBooleanFromString(values.builderMustBeHolder),
+          builderMustBeHolder,
+          builderMustBeHolder_inheritedboolean:
+            builderMustBeHolderInheritedBoolean,
           buildPermissiveness_array:
             PermissivenessInput.transformFromValueToItemClassPermissiveness(
               values.buildPermissiveness as (keyof State.AnchorPermissivenessType)[],
-              State.ChildUpdatePropagationPermissivenessType.BuildPermissiveness,
+              State.ChildUpdatePropagationPermissivenessType
+                .BuildPermissiveness,
               parentItemClass
             ),
         });
@@ -66,12 +91,16 @@ const BuildPermissiveness = ({ handleSubmit, data }: SubStepProps) => {
             parentItemClass={parentItemClass}
             error={props.errors.buildPermissiveness}
           />
-          <RadioInput.Inline
+          <RadioInput.InheritedBoolean
             name="builderMustBeHolder"
             title={`Does the builder of ${
               data?.name || "your item"
             } also need to be holding the NFT for that new item at time of build?`}
             value={props.values.builderMustBeHolder}
+            parentValue={builderMustBeHolderParentValue}
+            overridden={builderMustBeHolderOverridden}
+            trueValue="true"
+            falseValue="false"
             error={props.errors.builderMustBeHolder}
             options={[
               { title: "Yes", value: "true" },
