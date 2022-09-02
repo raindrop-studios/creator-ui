@@ -1,13 +1,12 @@
 import React from "react";
+
 import { State } from "@raindrops-protocol/raindrops";
 import { Checkbox, STYLE_TYPE } from "baseui/checkbox";
-
-import { FormControlBlock } from "../FormControlBlock";
-import { useFormikContext } from "formik";
 import { Block } from "baseui/block";
 import { LabelSmall } from "baseui/typography";
-import { Alert } from "baseui/icon";
-import { KIND, Notification } from "baseui/notification";
+import { useFormikContext } from "formik";
+
+import { FormControlBlock } from "../FormControlBlock";
 import { PermissivenessArray, PermissivenessInputProps, PermissivenessOption } from "./types";
 import { PermissivenessOptions } from "./constants";
 import {
@@ -20,7 +19,8 @@ import {
   validation,
   getOptions,
 } from "./utils";
-import InheritanceAlert from "./InheritanceAlert";
+import InheritanceAlert from "../inheritance/InheritanceAlert";
+import OverriddenNotification from "../inheritance/OverriddenNotification";
 
 export function Inline({
   title,
@@ -127,22 +127,7 @@ export function Inline({
           );
         })}
         {overridden && (
-          <Notification
-            kind={KIND.info}
-            overrides={{
-              Body: { style: { flexBasis: "100%" } },
-              InnerContainer: {
-                style: { display: "flex", alignItems: "center" },
-              },
-            }}
-          >
-            <Alert
-              overrides={{ Svg: { style: { marginRight: "5px" } } }}
-              size="scale800"
-            />{" "}
-            Parent has disallowed editing of this permissiveness, the above is
-            for information only.
-          </Notification>
+          <OverriddenNotification />
         )}
       </Block>
     </FormControlBlock>

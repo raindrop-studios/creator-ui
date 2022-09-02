@@ -1,26 +1,19 @@
-import { State } from "@raindrops-protocol/raindrops";
 import { Alert } from "baseui/icon";
 import { LabelXSmall } from "baseui/typography";
-import { ChangedFromInherited } from "./constants";
+import { InheritanceState } from "./constants";
 
 function InheritanceAlert({
   inheritanceState,
 }: {
-  inheritanceState:
-    | State.InheritanceState.Inherited
-    | State.InheritanceState.NotInherited
-    | typeof ChangedFromInherited;
+  inheritanceState: InheritanceState;
 }) {
   const getInheritanceText = (
-    state:
-      | State.InheritanceState.Inherited
-      | State.InheritanceState.NotInherited
-      | typeof ChangedFromInherited
+    state: InheritanceState
   ) => {
     switch (state) {
-      case State.InheritanceState.Inherited:
+      case InheritanceState.Inherited:
         return "Inherited from parent";
-      case ChangedFromInherited:
+      case InheritanceState.ChangedFromInherited:
         return (
           <>
             <Alert overrides={{ Svg: { style: { marginRight: "5px" } } }} />

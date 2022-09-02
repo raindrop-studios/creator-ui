@@ -1,7 +1,7 @@
 import { State } from "@raindrops-protocol/raindrops";
 import * as yup from "yup";
+import { getInheritanceState } from "../inheritance/utils";
 import {
-  ChangedFromInherited,
   ChildUpdatePropagationPermissivenessOptions,
   PermissivenessOptions,
 } from "./constants";
@@ -62,13 +62,8 @@ export const getInheritanceStatus = (
   option: PermissivenessOption
 ) => {
   const parentHasValueForOption = (parentValue || []).includes(option?.value);
-  if (parentHasValueForOption) {
-    if (isOptionChecked(value, option)) {
-      return State.InheritanceState.Inherited;
-    }
-    return ChangedFromInherited;
-  }
-  return State.InheritanceState.NotInherited;
+  const currentValue = isOptionChecked(value, option);
+  return getInheritanceState(currentValue, parentHasValueForOption || undefined);
 };
 
 export const validation = yup.array(

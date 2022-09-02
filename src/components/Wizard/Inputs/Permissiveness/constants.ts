@@ -90,5 +90,3 @@ export const ChildUpdatePropagationPermissivenessOptions: {
   },
 };
 
-export const ChangedFromInherited = "INHERITED_AND_CHANGED";
-
