@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useWallet } from "@solana/wallet-adapter-react";
 import { TokenStandard } from "@metaplex-foundation/mpl-token-metadata";
-import { State } from "@raindrops-protocol/raindrops";
 
-import { PermissivenessArray } from "../components/Wizard/Inputs/Permissiveness";
 import { Wizard } from "../components/Wizard";
 import useNetwork from "../hooks/useNetwork";
 import { CreateItemClassArgs } from "../hooks/useCreateItemClass";
@@ -22,7 +20,7 @@ import * as HasUses from "./HasUses";
 import * as ChildSettings from "./ChildSettings";
 import * as ChildrenMustBeEditions from "./ChildrenMustBeEditions";
 import * as Review from "./Review";
-import { ChildUpdatePropagationPermissivenessArray } from "../components/Wizard/Inputs/Permissiveness/types";
+import { ItemClassFormData } from "./constants";
 
 const CreateItemClassWizard = () => {
   const { network } = useNetwork();
@@ -123,7 +121,6 @@ function prepareItemClassConfig(
     index,
     freeBuild_inheritedboolean,
     builderMustBeHolder_inheritedboolean,
-    childrenMustBeEditions = null,
     childrenMustBeEditions_inheritedboolean,
     parent_itemclass: parentItemClass,
     parent,
@@ -139,11 +136,7 @@ function prepareItemClassConfig(
     data: {
       settings: {
         freeBuild: freeBuild_inheritedboolean,
-        // @ts-ignore
-        childrenMustBeEditions:
-          childrenMustBeEditions === null
-            ? null
-            : childrenMustBeEditions_inheritedboolean,
+        childrenMustBeEditions: childrenMustBeEditions_inheritedboolean || null,
         builderMustBeHolder: builderMustBeHolder_inheritedboolean,
         // @ts-ignore
         updatePermissiveness: updatePermissiveness_array || null,
@@ -177,29 +170,5 @@ function prepareItemClassConfig(
     totalSpaceBytes: 300,
   };
 }
-
-type ItemClassFormData = {
-  connectedWallet: string;
-  name?: string;
-  mint: string;
-  index: number;
-  hasParent: boolean;
-  parentItemClassKey?: string;
-  freeBuild: boolean;
-  freeBuild_inheritedboolean: State.InheritedBoolean;
-  hasComponents: boolean;
-  hasUses: boolean;
-  metadataUpdateAuthority?: string;
-  builderMustBeHolder: boolean;
-  builderMustBeHolder_inheritedboolean: State.InheritedBoolean;
-  childrenMustBeEditions?: boolean;
-  childrenMustBeEditions_inheritedboolean?: State.InheritedBoolean;
-  parent?: string;
-  parent_itemclass?: State.Item.ItemClass;
-  permissivenessToUse: State.PermissivenessType;
-  buildPermissiveness_array: PermissivenessArray;
-  updatePermissiveness_array: PermissivenessArray;
-  childUpdatePropagationPermissiveness_array: ChildUpdatePropagationPermissivenessArray;
-};
 
 export { CreateItemClassWizard };

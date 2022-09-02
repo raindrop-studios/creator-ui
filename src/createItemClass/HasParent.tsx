@@ -7,6 +7,7 @@ import {
   getBooleanFromString,
   getStringFromBoolean,
 } from "../components/Wizard/Inputs/Radio";
+import { InheritedProperties } from "./constants";
 
 const HasParent = ({ handleSubmit, data }: SubStepProps) => {
   const schema = yup.object({
@@ -17,14 +18,19 @@ const HasParent = ({ handleSubmit, data }: SubStepProps) => {
     <Formik
       initialValues={{ hasParent: getStringFromBoolean(data?.hasParent) }}
       onSubmit={(values: TValues, actions: FormikHelpers<TValues>) => {
+        actions.setSubmitting(true);
         const hasParent = getBooleanFromString(values?.hasParent);
         const clearParentValues = hasParent
           ? {}
           : { parent: undefined, parent_itemclass: undefined };
-        actions.setSubmitting(true);
+        const clearInheritedValues =
+          hasParent ? {} :Object.fromEntries(
+                InheritedProperties.map((key) => [key, undefined])
+              );
         handleSubmit({
           hasParent,
           ...clearParentValues,
+          ...clearInheritedValues,
         });
         actions.setSubmitting(false);
       }}
