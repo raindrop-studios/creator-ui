@@ -31,7 +31,7 @@ const UpdatePermissiveness = ({ handleSubmit, data }: SubStepProps) => {
     <Formik
       initialValues={{
         updatePermissiveness: data?.updatePermissiveness || parentValue,
-        permissivenessToUse: data?.permissivenessToUse,
+        permissivenessToUse: data?.permissivenessToUse || parentValue?.[0],
         metadataUpdateAuthority: data?.metadataUpdateAuthority || publicKey,
       }}
       onSubmit={(values: TValues, actions: FormikHelpers<TValues>) => {
@@ -45,7 +45,7 @@ const UpdatePermissiveness = ({ handleSubmit, data }: SubStepProps) => {
               parentItemClass
             ),
           permissivenessToUse:
-            values?.updatePermissiveness?.length === 0
+            parentValue?.length === 0
               ? undefined
               : values?.permissivenessToUse,
         });
@@ -69,12 +69,12 @@ const UpdatePermissiveness = ({ handleSubmit, data }: SubStepProps) => {
             parentItemClass={parentItemClass}
             error={props.errors.updatePermissiveness}
           />
-          {props.values.updatePermissiveness?.length > 1 && (
+          {parentValue?.length && parentValue.length > 1 && (
             <RadioInput.Inline
               name="permissivenessToUse"
-              title="Which permissiveness should be used to create this item class?"
-              help="How do you know what to put here //QUESTION"
-              options={getOptions(props.values.updatePermissiveness)}
+              title="Which permissiveness should be used to update the parent item class?"
+              help="When this item class is created, the parent will be updated with its new children"
+              options={getOptions(parentValue)}
               value={props.values.permissivenessToUse}
               error={props.errors.permissivenessToUse}
               onChange={props.handleChange}
