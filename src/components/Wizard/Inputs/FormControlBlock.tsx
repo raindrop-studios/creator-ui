@@ -12,7 +12,6 @@ export const FormControlBlock = ({
     display="flex"
     alignItems="flex-start"
     justifyContent="flex-start"
-    alignSelf="center"
     flexDirection="column"
   >
     <FormControl label={title} caption={help} error={error}>

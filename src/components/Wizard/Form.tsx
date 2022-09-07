@@ -21,8 +21,10 @@ export const FormBlock = ({ children }: { children: React.ReactNode }) => (
   <Block
     display="flex"
     flexDirection="column"
-    alignItems="center"
+    alignItems="stretch"
     padding="scale800"
+    maxWidth="800px"
+    margin="auto"
   >
     {children}
   </Block>
@@ -32,8 +34,8 @@ type SubmitButtonProps = {
   isLoading?: boolean;
   disabled?: boolean;
   children: React.ReactNode;
-  type?: ButtonProps['type'];
-  onClick?: ButtonProps['onClick'];
+  type?: ButtonProps["type"];
+  onClick?: ButtonProps["onClick"];
 };
 
 export function SubmitButton({
@@ -41,14 +43,20 @@ export function SubmitButton({
   disabled,
   children,
   onClick,
-  type = "submit"
+  type = "submit",
 }: SubmitButtonProps) {
   return (
     <Button
       type={type}
       disabled={disabled}
       isLoading={isLoading}
-      $style={{ margin: "20px" }}
+      $style={{
+        margin: "auto",
+        marginTop: "40px",
+        maxWidth: "350px",
+        width: "100%",
+        alignSelf: "center",
+      }}
       onClick={onClick}
     >
       {children}

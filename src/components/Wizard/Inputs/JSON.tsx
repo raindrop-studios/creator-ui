@@ -35,7 +35,7 @@ export function Inline({
         placeholder={value}
         locale={locale}
         height="60vh"
-        width="60vw"
+        width="50vw"
         viewOnly={!setValue}
         onChange={onChange}
       />

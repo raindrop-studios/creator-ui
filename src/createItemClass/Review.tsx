@@ -29,6 +29,7 @@ const ReviewData = ({ clean, data }: SubStepProps & { clean?: Function }) => {
   const submit = () => {
     createItemClass({ config: cleanedData || data });
   };
+  const notificationOverrrides = {Body: {style: {alignSelf: 'center', width: 'auto'}}}
   return (
     <FormBlock>
       {!loading && (!clean || cleanedData) ? (
@@ -42,7 +43,7 @@ const ReviewData = ({ clean, data }: SubStepProps & { clean?: Function }) => {
         <LoadingMessage message="Preparing data..." />
       )}
       {success && (
-        <Notification kind={NOTIFICATION_KIND.positive}>
+        <Notification kind={NOTIFICATION_KIND.positive} overrides={notificationOverrrides}>
           <>
             Item class transaction:{" "}
             <StyledLink href={transactionUrl} target="_blank">
@@ -52,7 +53,7 @@ const ReviewData = ({ clean, data }: SubStepProps & { clean?: Function }) => {
         </Notification>
       )}
       {error && (
-        <Notification kind={NOTIFICATION_KIND.negative}>
+        <Notification kind={NOTIFICATION_KIND.negative} overrides={notificationOverrrides}>
           <>Item class could not be created: {error.message}</>
         </Notification>
       )}

@@ -16,6 +16,16 @@ export enum Loading {
   Failed = 3,
 }
 
+export const doesItemClassExist = async (
+  tokenMint: web3.PublicKey,
+  index: number,
+  connection: Connection
+) => {
+  const [itemClassKey] = await Utils.PDA.getItemPDA(tokenMint, new BN(index));
+  const accountInfo = await connection.getAccountInfo(itemClassKey);
+  return !!accountInfo?.data;
+};
+
 export const getItemClass = async (
   itemClassKey: web3.PublicKey,
   connection: Connection

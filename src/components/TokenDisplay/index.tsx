@@ -4,9 +4,9 @@ import { Metadata } from "@metaplex-foundation/mpl-token-metadata";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { NotificationCircle, PLACEMENT } from "baseui/badge";
 import { Card, StyledBody, StyledAction } from "baseui/card";
-import { LabelLarge, LabelSmall } from "baseui/typography";
+import { LabelMedium, LabelSmall } from "baseui/typography";
 import { Check } from "baseui/icon";
-import { Button, KIND } from "baseui/button";
+import { Button, KIND, SIZE } from "baseui/button";
 import { useStyletron } from "baseui";
 
 import { TokenInfo } from "../../hooks/useFetchWalletTokens";
@@ -122,10 +122,16 @@ export const LoadedToken = ({
                   : undefined,
             }),
           },
+          Body: {
+            style: {
+              marginTop: "0px",
+              marginBottom: "0px",
+            },
+          },
         }}
       >
         <StyledBody>
-          <LabelLarge
+          <LabelMedium
             display="inline"
             overrides={{
               Block: {
@@ -134,7 +140,7 @@ export const LoadedToken = ({
             }}
           >
             {tokenName.replace(/[^a-z0-9#_]/gi, "")}
-          </LabelLarge>
+          </LabelMedium>
           {qty > 1 ? <LabelSmall display="inline"> x {qty}</LabelSmall> : null}
         </StyledBody>
         {handleToggleSelect && (
@@ -142,6 +148,7 @@ export const LoadedToken = ({
             <Button
               overrides={{ BaseButton: { style: { width: "100%" } } }}
               kind={selected ? KIND.primary : KIND.secondary}
+              size={SIZE.compact}
               // @ts-ignore
               onClick={(e: MouseEvent) => {
                 e.preventDefault();
@@ -163,12 +170,12 @@ const HeaderImage = ({ src }: { src: string }) => {
   return (
     <div
       style={{
-        backgroundColor: theme.colors.contentInverseSecondary,
+        backgroundColor: theme.colors.contentInverseTertiary,
         backgroundImage: `url('${src}')`,
         backgroundPosition: "center",
-        backgroundSize: "contain",
+        backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
-        height: "10em",
+        height: "8em",
         width: "100%",
       }}
     />

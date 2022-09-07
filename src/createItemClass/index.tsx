@@ -1,22 +1,26 @@
 import { useEffect, useState } from "react";
+
 import { useWallet } from "@solana/wallet-adapter-react";
 import { TokenStandard } from "@metaplex-foundation/mpl-token-metadata";
+
 import { Wizard } from "../components/Wizard";
+import useNetwork from "../hooks/useNetwork";
+import { CreateItemClassArgs } from "../hooks/useCreateItemClass";
+
 import * as ConnectWallet from "./ConnectWallet";
 import * as NameItem from "./NameItem";
 import * as TokenSelect from "./TokenSelect";
 import * as ItemClassIndex from "./ItemClassIndex";
 import * as HasParent from "./HasParent";
 import * as ParentItemClass from "./ParentItemClass";
-import * as MetadataUpdateAuthority from "./MetadataUpdateAuthority";
+import * as BuildPermissiveness from "./BuildPermissiveness";
+import * as UpdatePermissiveness from "./UpdatePermissiveness";
 import * as Freebuild from "./Freebuild";
 import * as HasUses from "./HasUses";
-import * as Review from "./Review";
-import * as BuilderMustBeHolder from "./BuilderMustBeHolder";
+import * as ChildSettings from "./ChildSettings";
 import * as ChildrenMustBeEditions from "./ChildrenMustBeEditions";
-import useNetwork from "../hooks/useNetwork";
-import { CreateItemClassArgs } from "../hooks/useCreateItemClass";
-import { State } from "@raindrops-protocol/raindrops";
+import * as Review from "./Review";
+import { ItemClassFormData } from "./constants";
 
 const CreateItemClassWizard = () => {
   const { network } = useNetwork();
@@ -59,19 +63,23 @@ const CreateItemClassWizard = () => {
         hash={HasParent.hash}
         Component={HasParent.Component}
       />
-      {data?.hasParent ? (
+      {data?.hasParent && (
         <Wizard.Step
           title={ParentItemClass.title}
           hash={ParentItemClass.hash}
           Component={ParentItemClass.Component}
         />
-      ) : (
-        <Wizard.Step
-          title={MetadataUpdateAuthority.title}
-          hash={MetadataUpdateAuthority.hash}
-          Component={MetadataUpdateAuthority.Component}
-        />
       )}
+      <Wizard.Step
+        title={BuildPermissiveness.title}
+        hash={BuildPermissiveness.hash}
+        Component={BuildPermissiveness.Component}
+      />
+      <Wizard.Step
+        title={UpdatePermissiveness.title}
+        hash={UpdatePermissiveness.hash}
+        Component={UpdatePermissiveness.Component}
+      />
       <Wizard.Step
         title={Freebuild.title}
         hash={Freebuild.hash}
@@ -83,9 +91,9 @@ const CreateItemClassWizard = () => {
         Component={HasUses.Component}
       />
       <Wizard.Step
-        title={BuilderMustBeHolder.title}
-        hash={BuilderMustBeHolder.hash}
-        Component={BuilderMustBeHolder.Component}
+        title={ChildSettings.title}
+        hash={ChildSettings.hash}
+        Component={ChildSettings.Component}
       />
       {data?.mint_metadata?.tokenStandard === TokenStandard.NonFungible && (
         <Wizard.Step
@@ -111,50 +119,36 @@ function prepareItemClassConfig(
     metadataUpdateAuthority,
     mint,
     index,
-    freeBuild,
-    builderMustBeHolder,
-    childrenMustBeEditions = null,
+    freeBuild_inheritedboolean,
+    builderMustBeHolder_inheritedboolean,
+    childrenMustBeEditions_inheritedboolean,
     parent_itemclass: parentItemClass,
+    parent,
+    permissivenessToUse = null,
+    buildPermissiveness_array,
+    updatePermissiveness_array,
+    childUpdatePropagationPermissiveness_array,
   } = data;
+  const updatePermissivenessToUse = permissivenessToUse
+    ? { [permissivenessToUse]: true }
+    : null;
   return {
     data: {
       settings: {
-        freeBuild: {
-          boolean: freeBuild,
-          // @ts-ignore
-          inherited: { notInherited: true }, // State.InheritanceState.NotInherited,
-        },
+        freeBuild: freeBuild_inheritedboolean,
+        childrenMustBeEditions: childrenMustBeEditions_inheritedboolean || null,
+        builderMustBeHolder: builderMustBeHolder_inheritedboolean,
         // @ts-ignore
-        childrenMustBeEditions:
-          childrenMustBeEditions === null
-            ? null
-            : {
-                boolean: childrenMustBeEditions,
-                inherited: { notInherited: true }, // State.InheritanceState.NotInherited,
-              },
-        builderMustBeHolder: {
-          boolean: builderMustBeHolder,
-          // @ts-ignore
-          inherited: { notInherited: true }, // State.InheritanceState.NotInherited,
-        },
-        updatePermissiveness: null,
-        buildPermissiveness: [
-          {
-            // @ts-ignore
-            permissivenessType: {
-              tokenHolder: true,
-            },
-            // @ts-ignore
-            inherited: {
-              notInherited: true,
-            },
-          },
-        ],
+        updatePermissiveness: updatePermissiveness_array || null,
+        // @ts-ignore
+        buildPermissiveness: buildPermissiveness_array || null,
         stakingWarmUpDuration: null,
         stakingCooldownDuration: null,
         stakingPermissiveness: null,
         unstakingPermissiveness: null,
-        childUpdatePropagationPermissiveness: [],
+        // @ts-ignore
+        childUpdatePropagationPermissiveness:
+          childUpdatePropagationPermissiveness_array || null,
       },
       config: {
         usageRoot: null,
@@ -170,29 +164,11 @@ function prepareItemClassConfig(
     mint,
     index,
     parent: parentItemClass,
-    updatePermissivenessToUse: {
-      tokenHolder: true,
-    },
+    parentKey: parent,
+    updatePermissivenessToUse,
     namespaceRequirement: 1,
     totalSpaceBytes: 300,
   };
 }
-
-type ItemClassFormData = {
-  connectedWallet: string;
-  name?: string;
-  mint: string;
-  index: number;
-  hasParent: boolean;
-  parentItemClassKey?: string;
-  freeBuild: boolean;
-  hasComponents: boolean;
-  hasUses: boolean;
-  metadataUpdateAuthority?: string;
-  builderMustBeHolder: boolean;
-  childrenMustBeEditions?: boolean;
-  parent?: string;
-  parent_itemclass?: State.Item.ItemClass;
-};
 
 export { CreateItemClassWizard };

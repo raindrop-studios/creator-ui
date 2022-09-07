@@ -7,6 +7,8 @@ const LoadingMessage = ({ message }: { message: string }) => (
     display="flex"
     flexDirection="column"
     alignItems="center"
+    alignSelf="center"
+    width="100%"
     $style={{ textAlign: "center" }}
   >
     <Spinner $size={SIZE.large} $style={{margin: "40px"}} />
